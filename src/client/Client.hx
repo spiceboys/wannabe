@@ -1,7 +1,5 @@
 package client;
 
-// import client.GameView;
-
 class DummyPlayer implements Player {
   @:constant var name:String;
   @:constant var color:Int;
@@ -26,7 +24,16 @@ class Client {
         width: size,
         players: players,
         units: [
-          
+          new Unit({
+            owner: players[0],
+            delay: 0,
+            hitpoints: 100,
+            x: 10,
+            y: 5,
+            canFly: false,
+            canSwim: false,
+            speed: 6,
+          })
         ],
         tiles: [
           for (s in 0...size * size)

@@ -1,0 +1,4 @@
+-D hxnodejs-ws=5.2.1-beta
+# @install: lix --silent download "haxelib:/hxnodejs-ws#5.2.1-beta" into hxnodejs-ws/5.2.1-beta/haxelib
+-lib hxnodejs
+-cp ${HAXE_LIBCACHE}/hxnodejs-ws/5.2.1-beta/haxelib/src

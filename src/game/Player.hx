@@ -1,6 +1,7 @@
 package game;
 
-interface Player extends Model {
-  var name:String;
-  var color:Int;
+class Player implements Model {
+  @:constant var id:PlayerId = new PlayerId();
+  @:constant var name:String;
+  @:constant var color:Int;
 }

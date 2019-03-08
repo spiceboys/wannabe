@@ -7,8 +7,8 @@ class GameView extends View {
   @:attribute var game:GameSession;
   @:computed var availableTiles:Map<Tile, Bool> = switch game.nextUnit {
     case None: new Map();
-    case Some(u):
-      [for (info in game.getTargetTilesFor(u))
+    case Some(_):
+      [for (info in game.availableMoves)
         game.getTile(info.x, info.y) => info.available
       ];
   }
@@ -56,6 +56,7 @@ class GameView extends View {
 
   function renderTile(x, y) {
     var t = game.getTile(x, y);
+    
     return 
       <td 
         class={
@@ -67,7 +68,11 @@ class GameView extends View {
               case TVoid: VOID;
             }
           )
-      }>
+        }
+        onclick={
+          if (availableTiles[t]) game.moveTo(x, y)
+        }
+      >
         {switch game.getUnit(x, y) {
           case None: null;
           case Some(_): 'X';

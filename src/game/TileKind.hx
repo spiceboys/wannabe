@@ -1,7 +1,7 @@
 package game;
 
 enum TileKind {
-  TWater;
+  TLava;
   TLand;
   TMountain;
   TVoid;

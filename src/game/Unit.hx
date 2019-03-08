@@ -28,7 +28,7 @@ class Unit implements Model {
   public function canEnter(terrain:TileKind)
     return switch terrain {
       case TVoid: false;
-      case TWater: canFly || canSwim;
+      case TLava: canFly || canSwim;
       case TMountain: canFly;
       case TLand: true;
     }

@@ -12,19 +12,44 @@ class GameView extends View {
         game.getTile(info.x, info.y) => info.available
       ];
   }
-  
-  static var TILE = css({
-    width: '20px',
-    height: '20px',
-    outlineOffset: '-2px',
+
+  static var GRID = css({
+    listStyle: 'none',
+    '& > *': {
+      display: 'flex',
+    }
   });
 
-  static var WATER = TILE.add(css({
-    background: 'blue',
+  static var TILE = css({
+    width: '90px',
+    height: '60px',
+    outlineOffset: '-2px',
+    flexGrow: '0',
+    flexShrink: '0',
+  });
+
+  static var LAVA_MIDDLE = TILE.add(css({
+    backgroundImage: 'url(../assets/lava_middle.png)',
   }));
 
-  static var LAND = TILE.add(css({
-    background: 'green',
+  static var LAVA_TOP = TILE.add(css({
+    backgroundImage: 'url(../assets/lava_top.png)',
+  }));
+
+  static var LAVA_BOTTOM = TILE.add(css({
+    backgroundImage: 'url(../assets/lava_bottom.png)',
+  }));
+
+  static var LAVA_CELL = TILE.add(css({
+    backgroundImage: 'url(../assets/lava_cell.png)',
+  }));    
+
+  static var LAND1 = TILE.add(css({
+    backgroundImage: 'url(../assets/dark_grass.png)',
+  }));
+
+  static var LAND2 = TILE.add(css({
+    backgroundImage: 'url(../assets/light_grass.png)',
   }));
 
   static var MOUNTAIN = TILE.add(css({
@@ -34,10 +59,6 @@ class GameView extends View {
   static var VOID = TILE.add(css({
     background: 'black',
   }));
-
-  static var TABLE = css({
-    borderSpacing: '0',
-  });
 
   static var AVAILABLE = css({
     outline: '2px solid lime'
@@ -62,9 +83,18 @@ class GameView extends View {
         class={
           showAvailability(t).add(
             switch t.kind {
-              case TWater: WATER;
+              case TLava: 
+                function getKind(delta)
+                  return game.getTile(x, y + delta).kind;
+                switch [getKind(-1), getKind(1)] {
+                  case [TLava | TVoid, TLava | TVoid]: LAVA_MIDDLE;
+                  case [_, TLava | TVoid]: LAVA_TOP;
+                  case [TLava | TVoid, _]: LAVA_BOTTOM;
+                  case _: LAVA_CELL;
+                }
               case TMountain: MOUNTAIN;
-              case TLand: LAND;
+              case TLand: 
+                if ((x + y) % 2 == 0) LAND1 else LAND2;
               case TVoid: VOID;
             }
           )
@@ -82,13 +112,13 @@ class GameView extends View {
 
   function render()
     return <div>
-      <table class={TABLE}>
+      <ul class={GRID}>
         {for (y in 0...game.height)
-          <tr>
+          <li>
             {for (x in 0...game.width) renderTile(x, y)}
-          </tr>
+          </li>
         }
-      </table>
+      </ul>
     </div>
   ;
 }

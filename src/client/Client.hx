@@ -11,7 +11,7 @@ class Client {
 
     var size = 20;
 
-    var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand, TileKind.TWater, TileKind.TMountain];
+    var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand, TileKind.TLava];
 
     var game = new GameSession({
       self: players[0],

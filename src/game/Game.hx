@@ -30,4 +30,11 @@ class Game implements Model {
       case null: Tile.NONE;
       case v: v;
     }
+
+  public function getTargetTilesFor(unit:Unit):List<TileInfo>
+    return [
+      for (x in unit.x - 1...unit.x + 2)
+        for (y in unit.y - 1...unit.y + 2)
+          { x: x, y: y, available: x == unit.x || y == unit.y }
+    ];
 }

@@ -3,6 +3,7 @@ package server;
 import haxe.Json;
 import haxe.ds.Map;
 import js.npm.ws.WebSocket;
+import server.Root;
 
 class Server {
   static public final BUILD_DATE = server.util.Macro.getBuildDate();
@@ -17,37 +18,72 @@ class Server {
     new Server().run();
   }
   
-  final players:Map<String, WebSocket>;
   final routes:Map<String, RouteHandler>;
+  final players:State<List<Player>>;
   final root:Root;
 
   public function new() {
-    players = [];
     routes = [];
+    players = new State(List.fromArray([]));
+
     root = new Root({
-      route: (route, handler) -> routes[route] = handler
+      route: (route, handler) -> routes[route] = handler,
+      players: players.observe()
     });
   }
 
   public function run() {
     final wss = new js.npm.ws.Server({port: port});
     wss.on("connection", (ws:WebSocket) -> {
+      trace("WebSocket connected");
+      var player:Player = null;
+
+      function call(route:String, ?data:Dynamic = null)
+        ws.send(Json.stringify({call: route, data: data}), _ -> {});
+      
+      function respond(route:String, ?data:Dynamic = null)
+        call('${route}Response', data);
+      
+      function disconnect(terminate:Bool = false) {
+        if (player != null) {
+          trace('Player left: ${player.id}');
+          players.set(players.value.filter(p -> p.id != player.id));
+          if (routes.exists("leave")) routes["leave"](player, null);
+        }
+        if (terminate) ws.terminate();
+      }
+      
       ws.on("message", json -> {
         final msg = Json.parse(json), route = msg.call;
-        if (routes.exists(route)) {
-          final res = routes[route](msg.data);
-          if (res != null)
-            res.handle(data -> ws.send(Json.stringify({call: '${route}Response', data: data}), _ -> {}));
+
+        if (route == "join") {
+          final playerId = msg.data.playerId;
+          if (players.value.exists(p -> p.id == playerId))
+            return respond(route, Failure(new Error('Player already connected: $playerId')));
+          
+          player = {
+            id: playerId,
+            connection: {
+              call: call,
+              disconnect: () -> disconnect(true)
+            }
+          };
+          players.set(players.value.prepend(player));
+          trace('Player joined: ${player.id}');
         }
-        else trace('Unhandled message: $msg');
+
+        if (!routes.exists(route))
+          return respond(route, Failure(new Error('Not implemented')));
+        
+        final res = routes[route](player, msg.data);
+        if (res != null)
+          res.handle(data -> respond(route, data));
       });
 
       ws.on("close", (code, reason) -> {
-        trace('Disconnected: code=${code} reason=${reason}');
-        // TODO: Handle disconnection
+        trace('WebSocket disconnected: code=${code} reason=${reason}');
+        disconnect();
       });
     });
   }
 }
-
-typedef RouteHandler = Dynamic->Null<Promise<Dynamic>>;

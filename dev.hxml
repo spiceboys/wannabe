@@ -1,4 +1,5 @@
 -lib coconut.vdom
 -js bin/client.js
 -cp src
+-dce full
 -main client.Client

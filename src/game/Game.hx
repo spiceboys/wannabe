@@ -7,9 +7,12 @@ class Game implements Model {
   @:constant var width:Int;
   @:computed var height:Int = Math.ceil(tiles.length / width);
 
+  @:constant var service:PlayerId->Action->Promise<Array<Reaction>> = runLocally;
+
   @:constant private var tiles:tink.pure.Slice<Tile>;
   @:constant var players:List<Player>;
   @:observable var units:List<Unit>;
+
   @:computed var nextUnit:Option<Unit> = {
 
     var ret = None,
@@ -25,6 +28,58 @@ class Game implements Model {
   }    
 
   @:computed @:skipCheck private var pathFinder:pathfinder.Pathfinder = new pathfinder.Pathfinder(this);
+
+  @:computed var availableMoves:List<TileInfo> = switch nextUnit {
+    case None: null;
+    case Some(u): getTargetTilesFor(u);
+  }
+
+  function runLocally(player:PlayerId, action:Action):Promise<Array<Reaction>>
+    return switch action {
+      case Move(x, y):
+        switch nextUnit {
+          case Some(u) if (u.owner.id == player): 
+            var ret:Promise<Array<Reaction>> = new Error('illegal');
+            for (target in availableMoves)
+              if (target.x == x && target.y == y) {
+                if (target.available)
+                  ret = [UnitUpdate(u.id, tink.Anon.merge(u.status, x = x, y = y, delay = u.delay + u.frequency))];
+                break;
+              }          
+            ret;
+          default: new Error('illegal move');
+        }
+    }
+
+  function unitById(id) {
+    for (u in units)
+      if (u.id == id) return Some(u);
+    return None;
+  }
+
+  function apply(reactions:Array<Reaction>) {
+    for (r in reactions) switch r {
+      case UnitUpdate(id, to):
+        switch unitById(id) {
+          case None: //TODO: panic or something
+          case Some(u):
+            @:privateAccess u.update(to);
+        }
+    }
+    return reactions;
+  } 
+
+  public function dispatch(p:PlayerId, action:Action) {
+    var ret = service(p, action);
+    ret.handle(@do switch _ {
+      case Success(updates): apply(updates);
+      case Failure(e): //TODO: panic or something
+    });
+    return ret;
+  }
+
+  @:transition function moveTo(x:Int, y:Int, by:Player) 
+    return dispatch(by.id, Move(x, y)).next(_ -> @patch {});
 
   public function getUnit(x:Int, y:Int)
     return units.first(u -> u.alive && u.x == x && u.y == y);

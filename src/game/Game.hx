@@ -8,6 +8,7 @@ class Game implements Model {
   @:constant private var tiles:tink.pure.Slice<Tile>;
   @:constant var players:List<Player>;
   @:observable var units:List<Unit>;
+
   @:computed var nextUnit:Option<Unit> = {
 
     var ret = None,
@@ -21,6 +22,25 @@ class Game implements Model {
 
     return ret;
   }    
+
+  @:computed var availableMoves:List<TileInfo> = switch nextUnit {
+    case None: null;
+    case Some(u): getTargetTilesFor(u);
+  }
+
+  @:transition function moveTo(x:Int, y:Int, by:Player) {
+    switch nextUnit {
+      case Some(u) if (u.owner == by):
+        for (target in availableMoves)
+          if (target.x == x && target.y == y) {
+            if (target.available)
+              return @:privateAccess u.moveTo(x, y).next(_ -> @patch {});
+            break;
+          }
+      default: 
+    }
+    return new Error('illegal');
+  }
 
   public function getUnit(x:Int, y:Int)
     return units.first(u -> u.alive && u.x == x && u.y == y);

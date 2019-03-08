@@ -9,6 +9,7 @@ class Unit implements Model {
   @:constant var canFly:Bool;
   @:constant var canSwim:Bool;
   @:observable var speed:Int;  
+  @:observable var frequency:Float;  
   @:computed var alive:Bool = hitpoints > 0;
   
   public function canEnter(terrain:TileKind)
@@ -18,4 +19,7 @@ class Unit implements Model {
       case TMountain: canFly;
       case TLand: true;
     }
+
+  @:transition private function moveTo(x:Int, y:Int)
+    return { x: x, y: y, delay: frequency + delay };
 }

@@ -8,4 +8,7 @@ class GameSession implements Model {
     case None: false;
     case Some(u): u.owner == self;
   }
+
+  public function moveTo(x:Int, y:Int)
+    return game.moveTo(x, y, self);
 }

@@ -8,8 +8,6 @@ class Remote extends WebSocketService {
 		this.playerId = playerId;
 	}
 
-	public function route(route:String, )
-
 	public function connect():Promise<ServerInfo> {
 		trace('Connecting: url=$url playerId=$playerId');
 		return connectWS()

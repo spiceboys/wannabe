@@ -1,5 +1,7 @@
 package game;
 
+import pathfinder.*;
+
 class Game implements Model {
   
   @:constant var width:Int;
@@ -22,6 +24,8 @@ class Game implements Model {
     return ret;
   }    
 
+  @:computed @:skipCheck private var pathFinder:pathfinder.Pathfinder = new pathfinder.Pathfinder(this);
+
   public function getUnit(x:Int, y:Int)
     return units.first(u -> u.alive && u.x == x && u.y == y);
 
@@ -31,10 +35,13 @@ class Game implements Model {
       case v: v;
     }
 
-  public function getTargetTilesFor(unit:Unit):List<TileInfo>
+  public function getTargetTilesFor(unit:Unit):List<TileInfo> {
+    var origin = new Coordinate(unit.x, unit.y);
     return [
-      for (x in unit.x - 1...unit.x + 2)
-        for (y in unit.y - 1...unit.y + 2)
-          { x: x, y: y, available: x == unit.x || y == unit.y }
+      for (x in Std.int(Math.max(unit.x - unit.speed, 0))...Std.int(Math.min(unit.x + unit.speed + 1, width)))
+        for (y in Std.int(Math.max(unit.y - unit.speed, 0))...Std.int(Math.min(unit.y + unit.speed + 1, height)))
+          { x: x, y: y, available: unit.canEnter(getTile(x, y).kind) && !(unit.x == x && unit.y == y) && 
+            pathFinder.createPath(origin, new Coordinate(x, y), (tileX, tileY)->unit.canEnter(getTile(tileX, tileY).kind), unit.speed) != null }
     ];
+  }
 }

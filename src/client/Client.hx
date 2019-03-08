@@ -59,5 +59,14 @@ class Client {
         <GameView game={game} />
       )
     );
+    testWS();
+  }
+
+  static function testWS() {
+    new client.service.Remote("ws://localhost:2751", "Baby Spice")
+      .connect()
+      .handle(serverInfo -> {
+        trace('connected, serverInfo=$serverInfo');
+      });
   }
 }

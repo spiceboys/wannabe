@@ -1,5 +1,7 @@
 package client;
 
+// import client.GameView;
+
 class DummyPlayer implements Player {
   @:constant var name:String;
   @:constant var color:Int;
@@ -16,14 +18,16 @@ class Client {
 
     var size = 20;
 
-    var tiles = [TileKind.Land, TileKind.Land, TileKind.Land, TileKind.Water, TileKind.Mountain];
+    var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand, TileKind.TWater, TileKind.TMountain];
 
     var game = new GameSession({
       self: players[0],
       game: new Game({
         width: size,
         players: players,
-        units: [],
+        units: [
+          
+        ],
         tiles: [
           for (s in 0...size * size)
             new Tile({ kind: tiles[Std.random(tiles.length)]})

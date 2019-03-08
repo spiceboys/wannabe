@@ -42,17 +42,6 @@ class WebSocketService {
 				.handle(msg -> cb(msg.data));
 			call(route, data);
 		});
-
-	// function greet()
-	// 	return Future.async(cb -> {
-	// 		connector.onMessage.nextTime(obj -> obj.ready).handle(_ -> {
-	// 			trace("Received ready message");
-	// 			// state.otherPlayerReady = true;
-	// 			cb(Noise);
-	// 		});
-	// 		trace("Sending greetings");
-	// 		connector.send({greetings: true, who: playerId});
-	// 	});
 }
 
 @:tink private class WebSocketConnector {

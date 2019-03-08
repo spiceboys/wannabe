@@ -1,0 +1,4 @@
+-lib coconut.vdom
+-js bin/client.js
+-cp src
+-main client.Client

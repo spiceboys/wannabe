@@ -1,0 +1,6 @@
+{
+  "name": "wannabe",
+  "dependencies": {
+    "lix": "^15.3.5"
+  }
+}

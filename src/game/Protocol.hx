@@ -1,6 +1,6 @@
-package server;
+package game;
 
-import client.service.vo.ServerInfo;
+// import client.service.vo.ServerInfo;
 import game.*;
 import game.Unit;
 
@@ -14,10 +14,11 @@ enum ClientMessage {
 }
 
 enum ServerMessage {
-  RoomJoined(players:Array<LobbyPlayer>, serverInfo:ServerInfo);
+  // RoomJoined(players:Array<LobbyPlayer>);
   RoomChanged(players:Array<LobbyPlayer>);
   GameStarted(init:GameInit);
   GameReaction(reactions:Array<Reaction>);
+  Panic(error:String);
 }
 
 typedef GameInit = {

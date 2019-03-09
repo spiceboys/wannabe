@@ -1,16 +1,22 @@
 package game;
 
 import pathfinder.*;
+import game.Protocol;
+import tink.pure.Slice;
 
-class Game implements Model {
+typedef Game = GameOf<Player>;
+
+class GameOf<TPlayer:Player> implements Model {
   
+  @:constant var id:String;
   @:constant var width:Int;
   @:computed var height:Int = Math.ceil(tiles.length / width);
 
+  @:observable var running:Bool = false;
   @:constant var service:PlayerId->Action->Promise<Array<Reaction>> = runLocally;
 
-  @:constant private var tiles:tink.pure.Slice<Tile>;
-  @:constant var players:List<Player>;
+  @:observable private var tiles:Slice<Tile>;
+  @:observable var players:List<TPlayer>;
   @:observable var units:List<Unit>;
 
   @:computed var nextUnit:Option<Unit> = {
@@ -25,7 +31,52 @@ class Game implements Model {
       }
 
     return ret;
-  }    
+  }   
+
+  #if server
+
+  @:transition function addPlayer(p:TPlayer)
+    return 
+      if (running) new Error('illegal');
+      else { players: players.append(p) }; 
+
+  @:transition function disconnectPlayer(p:TPlayer)
+    return { players: players.filter(keep -> keep.id != p.id )};
+
+  @:transition function changePlayer(nu:TPlayer) {
+    if (!running) {
+      var players = players.toArray();
+      for (i in 0...players.length)
+        if (players[i].id == nu.id) {
+          players[i] = nu;
+          return { 
+            players: List.fromArray(players),
+          };
+        }
+    }
+    return new Error('invalid');
+  }
+
+  @:transition function _startGame() {
+    var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand, TileKind.TLava];
+    return @patch { 
+      running: true,
+      tiles: [
+        for (s in 0...width * width)
+          new Tile({ kind: tiles[Std.random(tiles.length)]})
+      ],
+    }
+  }
+  public function startGame():GameInit {
+    _startGame();
+    return {
+      width: width,
+      tiles: [for (t in tiles) t.kind],
+      units: [],
+    }
+  }
+
+  #end
 
   @:computed @:skipCheck private var pathFinder:pathfinder.Pathfinder = new pathfinder.Pathfinder(this);
 
@@ -78,7 +129,7 @@ class Game implements Model {
     return ret;
   }
 
-  @:transition function moveTo(x:Int, y:Int, by:Player) 
+  @:transition function moveTo(x:Int, y:Int, by:TPlayer) 
     return dispatch(by.id, Move(x, y)).next(_ -> @patch {});
 
   public function getUnit(x:Int, y:Int)

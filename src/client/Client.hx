@@ -1,5 +1,7 @@
 package client;
 
+import game.Protocol;
+
 class Client {
   static function main() {
     var players:Array<Player> = [
@@ -59,6 +61,8 @@ class Client {
         <LobbyView players={players} self={players[0].id} />
       )
     );
+
+    // trace(Std.string(haxe.Json.parse(haxe.Json.stringify(JoinRoom('fo', { id: new PlayerId(), name: 'foobar', color: 0xFF00FF })))));
     
     testWS();
   }

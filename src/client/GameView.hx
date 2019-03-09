@@ -10,12 +10,12 @@ class GameView extends View {
   @:computed var availableTiles:Map<Tile, Bool> = switch game.nextUnit {
     case Some(u) if (u.owner.id == game.self.id && !busy):
       if (u.moved)
-        [for (info in game.availableMoves)
-          game.getTile(info.x, info.y) => info.available
-        ];
-      else
         [for (target in game.units) if (game.canAttack(u, target))
           game.getTile(target.x, target.y) => true
+        ];
+      else
+        [for (info in game.availableMoves)
+          game.getTile(info.x, info.y) => info.available
         ];
     default: new Map();
   }

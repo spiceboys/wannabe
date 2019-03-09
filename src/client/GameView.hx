@@ -112,7 +112,7 @@ class GameView extends View {
             switch game.winner {
               case Some(winner): 
                 if (winner.id == game.self.id) "You Rule!";
-                else 'You Suck! ${winner.name} Rules!';
+                else "You Suck! " + winner.name + " Rules!";
               case None:
                 if (game.survivingPlayers.exists(p -> p.id == game.self.id)) "";
                 else "You Suck!";

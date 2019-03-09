@@ -87,6 +87,9 @@ class GameView extends View {
       {for (u in game.units)
         <UnitView unit={u} key={u} color={getPlayerColor(u.owner.id)} />
       }
+      {for (j in game.jewels)
+        <JewelView jewel={j} />
+      }
       <Isolated>
         <div class={SCORE}>
           {for (p in game.players)

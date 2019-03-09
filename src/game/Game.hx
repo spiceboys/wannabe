@@ -43,7 +43,7 @@ class GameOf<TPlayer:Player> implements Model {
   }
 
   public function computeDamage(attacker:Unit, target:Unit)
-    return 1;
+    return attacker.damage;
 
   @:computed var nextUnit:Option<Unit> = {
 
@@ -132,6 +132,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 6,
+            damage: 3,
           }
         }),
         new Unit({
@@ -150,6 +151,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 4,
+            damage: 3,
           }
         }),
         new Unit({
@@ -157,7 +159,7 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Octopus3,
           status: {
-            range: 6,
+            range: 2,
             moved: false,
             delay: 0,
             hitpoints: 15,
@@ -168,6 +170,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 4,
+            damage: 5,
           }
         }),
       ];
@@ -188,6 +191,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 5,
+            damage: 2,
           }
         }),
         new Unit({
@@ -206,6 +210,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 6,
+            damage: 4,
           }
         }),
         new Unit({
@@ -224,6 +229,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 4,
+            damage: 2,
           }
         }),
       ];
@@ -244,6 +250,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 8,
+            damage: 4,
           }
         }),
         new Unit({
@@ -262,6 +269,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 4,
+            damage: 2,
           }
         }),
         new Unit({
@@ -269,7 +277,7 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Penguin3,
           status: {
-            range: 6,
+            range: 3,
             moved: false,
             delay: 0,
             hitpoints: 12,
@@ -280,6 +288,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 6,
+            damage: 5,
           }
         }),
       ];

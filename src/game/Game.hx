@@ -19,6 +19,12 @@ class GameOf<TPlayer:Player> implements Model {
   @:observable var players:List<TPlayer> = @byDefault null;
   @:observable var units:List<Unit> = @byDefault null;
 
+  public function canAttack(attacker:Unit, target:Unit)
+    return true;
+
+  public function computeDamage(attacker:Unit, target:Unit)
+    return 1;
+
   @:computed var nextUnit:Option<Unit> = {
 
     var ret = None,
@@ -61,6 +67,7 @@ class GameOf<TPlayer:Player> implements Model {
     var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand],
         size = 20,
         players = players.toArray();
+
     return @patch { 
       width: size,
       running: true,
@@ -74,9 +81,11 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Penguin1,
           status: {
+            range: 1,
             moved: false,
             delay: 0,
-            hitpoints: 100,
+            hitpoints: 10,
+            maxHitpoints: 10,
             x: 10,
             y: 5,
             frequency: 1,
@@ -92,7 +101,9 @@ class GameOf<TPlayer:Player> implements Model {
           status: {
             moved: false,
             delay: 0,
-            hitpoints: 100,
+            range: 7,
+            hitpoints: 5,
+            maxHitpoints: 5,
             x: 10,
             y: 15,
             frequency: 1,
@@ -150,6 +161,21 @@ class GameOf<TPlayer:Player> implements Model {
             ret;
           default: new Error('illegal move');
         }
+
+      case Attack(x, y):
+        switch nextUnit {
+          case Some(u) if (u.owner.id == player): 
+            switch getUnit(x, y) {
+              case Some(target) if (canAttack(u, target)):
+                [
+                  UnitUpdate(u.id, tink.Anon.merge(u.status, moved = false, delay = u.delay + u.frequency)),
+                  UnitUpdate(target.id, tink.Anon.merge(target.status, hitpoints = target.hitpoints - computeDamage(u, target)))
+                ];
+              default:
+                new Error('illegal');
+            }
+          default: new Error('illegal move');
+        }        
       case Skip:
         switch nextUnit {
           case Some(u) if (u.owner.id == player): 
@@ -201,6 +227,9 @@ class GameOf<TPlayer:Player> implements Model {
 
   @:transition function skip(by:TPlayer) 
     return dispatch(by.id, Skip).next(_ -> @patch {});
+
+  @:transition function attack(x:Int, y:Int, by:TPlayer)
+    return dispatch(by.id, Attack(x, y)).next(_ -> @patch {});
 
   public function getUnit(x:Int, y:Int)
     return units.first(u -> u.alive && u.x == x && u.y == y);

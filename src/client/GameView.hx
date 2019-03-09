@@ -8,10 +8,15 @@ class GameView extends View {
   @:computed var busy:Bool = game.isInTransition;
 
   @:computed var availableTiles:Map<Tile, Bool> = switch game.nextUnit {
-    case Some(u) if (u.owner.id == game.self.id && !busy && !u.moved):
-      [for (info in game.availableMoves)
-        game.getTile(info.x, info.y) => info.available
-      ];
+    case Some(u) if (u.owner.id == game.self.id && !busy):
+      if (u.moved)
+        [for (info in game.availableMoves)
+          game.getTile(info.x, info.y) => info.available
+        ];
+      else
+        [for (target in game.units) if (game.canAttack(u, target))
+          game.getTile(target.x, target.y) => true
+        ];
     default: new Map();
   }
 
@@ -113,7 +118,11 @@ class GameView extends View {
           )
         }
         onclick={
-          if (availableTiles[t]) game.moveTo(x, y)
+          if (availableTiles[t]) 
+            switch game.nextUnit {
+              case Some({ moved: false }): game.moveTo(x, y);
+              default:
+            }
         }
       >
       </div>;

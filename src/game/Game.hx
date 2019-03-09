@@ -3,6 +3,7 @@ package game;
 import pathfinder.*;
 import game.Protocol;
 import tink.pure.Slice;
+import game.Reaction;
 
 typedef Game = GameOf<Player>;
 
@@ -324,11 +325,13 @@ class GameOf<TPlayer:Player> implements Model {
         switch nextUnit {
           case Some(u) if (u.owner.id == player): 
             switch getUnit(x, y) {
-              case Some(target) if (canAttack(u, target)):
+              case Some(target) if (canAttack(u, target, true)):
                 [
                   UnitUpdate(u.id, tink.Anon.merge(u.status, moved = false, delay = u.delay + u.frequency)),
-                  UnitUpdate(target.id, tink.Anon.merge(target.status, hitpoints = target.hitpoints - computeDamage(u, target)))
-                ];
+                  UnitUpdate(target.id, tink.Anon.merge(target.status, hitpoints = target.hitpoints - computeDamage(u, target))),
+                ].concat(
+                  if (target.hitpoints - computeDamage(u, target) <= 0) [SpawnGem(target)] else []
+                );
               default:
                 new Error('illegal');
             }
@@ -367,9 +370,17 @@ class GameOf<TPlayer:Player> implements Model {
           case Some(u):
             @:privateAccess u.update(to);
         }
+      case SpawnGem(u):
+        unitKilled(u);
+        case CollectGem(_, _): throw "Please, implement me before you die";
     }
     return reactions;
-  } 
+  }
+
+  @:transition private function unitKilled(u:Unit) {
+    trace("unitKilled", u.id);
+    return {units: units.filter(cu -> cu.id != u.id)};
+  }
 
   public function dispatch(p:PlayerId, action:Action) {
     var ret = service(p, action);

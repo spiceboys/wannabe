@@ -110,11 +110,13 @@ class GameView extends View {
       <Isolated>
         <div class={NOTIFICATIONS}>
           {
-            switch [game.players.count(p -> p.jewels != 0), game.self.jewels] {
-              case [1, 0]: "Game Over";
-              case [1, _]: "You are the fucking king";
-              case [_, 0]: "You Lose!";
-              case _: "";
+            switch game.winner {
+              case Some(winner): 
+                if (winner.id == game.self.id) "You Rule!";
+                else 'You Suck! ${winner.name} Rules!';
+              case None:
+                if (game.survivingPlayers.exists(p -> p.id == game.self.id)) "";
+                else "You Suck!";
             }
           }
         </div>

@@ -54,8 +54,8 @@ class StartView extends View {
 
   static var H1 = css({
     color: "#f1f1f1",
-    fontSize: "70px",
-    marginBottom: "60px"
+    fontSize: "50px",
+    // marginBottom: "60px"
   });
   
   static var BODY = css({
@@ -68,7 +68,8 @@ class StartView extends View {
 
   static var PAGE = css({
     textAlign: "center",
-    padding: "50px"
+    padding: "50px",
+    paddingBottom: '0',
   });
   
   static var UL = css({
@@ -111,7 +112,7 @@ class StartView extends View {
 
     return
       <li class={[cls => true, SELECTED => h == house]} onclick={house = h}>
-        <img src={"./assets/select_" + stringVal + ".png"}/>
+        <img height={200} src={"./assets/select_" + stringVal + ".png"}/>
       </li>
     ;
   }

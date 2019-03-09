@@ -339,7 +339,9 @@ class GameOf<TPlayer:Player> implements Model {
             for (target in availableMoves)
               if (target.x == x && target.y == y) {
                 if (target.available)
-                  ret = [UnitUpdate(u.id, tink.Anon.merge(u.status, x = x, y = y, moved = true))];
+                  ret = [UnitUpdate(u.id, tink.Anon.merge(u.status, x = x, y = y, moved = true))].concat(
+                    if (jewels.exists(j -> j.x == x && j.y == y)) [CollectGem(player, x, y)] else []
+                  );
                 break;
               }
             ret;
@@ -395,16 +397,35 @@ class GameOf<TPlayer:Player> implements Model {
           case Some(u):
             @:privateAccess u.update(to);
         }
+
       case SpawnGem(unitId, x, y):
         unitKilled(unitId);
         spawnGem(x, y);
-      case CollectGem(_, _): throw "Please, implement me before you die";
+
+      case CollectGem(playerId, x, y):
+        gemRemoved(x, y);
+        creditPlayer(playerId);
     }
     return reactions;
   }
 
   @:transition private function unitKilled(unitId:UnitId) {
     return {units: units.filter(cu -> cu.id != unitId)};
+  }
+
+  @:transition private function creditPlayer(id:String) {
+    var players = players.toArray();
+    for (i in 0...players.length)
+      if (players[i].id == id) {
+        var player = Reflect.copy(players[i]);
+        untyped player.jewels++;
+        players[i] = player;
+      }
+    return {players: List.fromArray(players)};
+  }
+
+  @:transition private function gemRemoved(x:Int, y:Int) {
+    return {jewels: jewels.filter(j -> j.x != x || j.y != y)};
   }
 
   @:transition private function spawnGem(x:Int, y:Int) {

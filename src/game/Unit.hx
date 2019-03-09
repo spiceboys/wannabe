@@ -4,12 +4,14 @@ typedef UnitStatus = {
   final x:Int;
   final y:Int;
   final hitpoints:Int;
+  final maxHitpoints:Int;
   final delay:Float;
   final canFly:Bool;
   final canSwim:Bool;
   final speed:Int;  
   final frequency:Float; 
   final moved:Bool;
+  final range:Int;
 }
 
 enum UnitKind {

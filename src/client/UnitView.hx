@@ -2,8 +2,11 @@ package client;
 
 import client.Css.make in css;
 
+using StringTools;
+
 class UnitView extends View {
   @:attribute var unit:Unit;
+  @:attribute var color:Int = 0x00AA00;
   function getClass()
     return switch unit.kind {
       case Robot1: ROBOT_1;
@@ -20,13 +23,26 @@ class UnitView extends View {
   @:computed var transform:String = 'translate(${unit.x * 90}px, ${unit.y * 60}px)';
 
   function render()
-    return <div class={getClass()} style={{ transform: transform }}></div>;
+    return <div class={getClass()} style={{ transform: transform }}>
+      <div class={HEALTHBAR} style={{ background: '#' + color.hex(6) }}>
+        <div style={{ height: '100%', width: 100 * (1 - unit.hitpoints / unit.maxHitpoints) + '%'}} />
+      </div>
+    </div>;
 
-  function viewDidMount()
-    trace('mounted ${unit.id}');
+  static var HEALTHBAR = css({
+    width: '80px',
+    height: '8px',
+    position: 'relative',
+    top: '-20px',
+    boxShadow: '1px 1px 3px 1px black',
+    '&>div': {
+      background: 'rgba(0, 0, 0, 0.4)',
+    }
+  });
 
   static var UNIT = css({
     position: 'absolute',
+    pointerEvents: 'none',
     left: '0px',
     transition: 'all .35s',
   });

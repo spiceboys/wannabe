@@ -8,10 +8,15 @@ class GameView extends View {
   @:computed var busy:Bool = game.isInTransition;
 
   @:computed var availableTiles:Map<Tile, Bool> = switch game.nextUnit {
-    case Some(u) if (u.owner.id == game.self.id && !busy && !u.moved):
-      [for (info in game.availableMoves)
-        game.getTile(info.x, info.y) => info.available
-      ];
+    case Some(u) if (u.owner.id == game.self.id && !busy):
+      if (u.moved)
+        [for (target in game.units) if (game.canAttack(u, target))
+          game.getTile(target.x, target.y) => true
+        ];
+      else
+        [for (info in game.availableMoves)
+          game.getTile(info.x, info.y) => info.available
+        ];
     default: new Map();
   }
 
@@ -73,11 +78,13 @@ class GameView extends View {
   }));
 
   static var AVAILABLE = css({
-    outline: '2px solid lime'
+    outline: '2px solid lime',
+    cursor: 'pointer'
   });
 
   static var UNAVAILABLE = css({
-    outline: '2px solid red'
+    outline: '2px solid red',
+    cursor: 'not-allowed'
   });
 
   function showAvailability(t:Tile):ClassName
@@ -113,7 +120,11 @@ class GameView extends View {
           )
         }
         onclick={
-          if (availableTiles[t]) game.moveTo(x, y)
+          if (availableTiles[t]) 
+            switch game.nextUnit {
+              case Some({ moved: false }): game.moveTo(x, y);
+              default: game.attack(x, y);
+            }
         }
       >
       </div>;
@@ -126,6 +137,12 @@ class GameView extends View {
     button: {
       padding: '1em'
     }
+  });
+
+  static var NOTIFICATIONS = css({
+    position: 'fixed',
+    bottom: '10px',
+    left: '50%',
   });
 
   function render()
@@ -149,6 +166,16 @@ class GameView extends View {
                 default: 'Skip Attack';
               }
             }</button>
+        }
+      </div>
+      <div class={NOTIFICATIONS}>
+        {
+          switch [game.players.count(p -> p.jewels != 0), game.self.jewels] {
+            case [1, 0]: "Game Over";
+            case [1, _]: "You are the fucking king";
+            case [_, 0]: "You Lose!";
+            case _: "";
+          }
         }
       </div>
     </div>

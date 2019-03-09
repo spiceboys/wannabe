@@ -16,6 +16,7 @@ class Client {
       name: "",
       house: null,
       ready: false,
+      jewels: 1
     });
 
     final remote = client.service.Remote.connect(

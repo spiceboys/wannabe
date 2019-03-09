@@ -14,4 +14,8 @@ class GameSession implements Model {
 
   public function skip()
     return game.skip(self);
+
+  public function attack(x:Int, y:Int)
+    return game.attack(x, y, self);
+
 }

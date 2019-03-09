@@ -96,8 +96,7 @@ class Server {
             case JoinRoom(_):
               respond(Panic('already joined a room'));
             case SetPlayerDetails(name, house):
-              // player = tink.Anon.merge(player, name = name, house = house, ready = true); // DEBUG: `ready = true` just for testing
-              player = tink.Anon.merge(player, name = name, house = house); // DEBUG: `ready = true` just for testing
+              player = tink.Anon.merge(player, name = name, house = house);
               report(room.changePlayer(player)).handle(roomChanged);
             case SetReady(ready):
               player = tink.Anon.merge(player, ready = ready);

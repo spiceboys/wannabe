@@ -1,11 +1,13 @@
 {
   "name": "wannabe",
   "dependencies": {
+    "http-server": "^0.11.1",
     "lix": "^15.3.5",
     "nodemon": "^1.18.10"
   },
   "scripts": {
     "postinstall": "lix download && npm run update-server",
+    "start-www": "http-server -c-1 ./bin",
     "update-server": "cd bin && npm ci",
     "start": "haxe server.hxml && nodemon bin/server.js"
   }

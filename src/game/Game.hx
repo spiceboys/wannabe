@@ -179,7 +179,7 @@ class GameOf<TPlayer:Player> implements Model {
                 new Error('illegal');
             }
           default: new Error('illegal move');
-        }        
+        }
       case Skip:
         switch nextUnit {
           case Some(u) if (u.owner.id == player): 
@@ -188,7 +188,7 @@ class GameOf<TPlayer:Player> implements Model {
             else
               [UnitUpdate(u.id, tink.Anon.merge(u.status, moved = true))];
           default: new Error('illegal move');
-        }      
+        }
     }
 
   function unitById(id) {

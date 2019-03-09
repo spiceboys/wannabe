@@ -13,6 +13,10 @@ class GameView extends View {
     default: new Map();
   }
 
+  static var ROOT = css({
+    position: 'relative',
+  });
+  
   static var GRID = css({
     listStyle: 'none',
     '& > *': {
@@ -26,7 +30,6 @@ class GameView extends View {
     outlineOffset: '-2px',
     flexGrow: '0',
     flexShrink: '0',
-    position: 'relative',
   });
 
   static var LAVA_MIDDLE = TILE.add(css({
@@ -104,15 +107,11 @@ class GameView extends View {
           if (availableTiles[t]) game.moveTo(x, y)
         }
       >
-        {switch game.getUnit(x, y) {
-          case Some(u): <UnitView key={u} unit={u} />
-          case None: null;
-        }}
       </div>;
   }
 
   function render()
-    return <div>
+    return <div class={ROOT}>
       <ul class={GRID}>
         {for (y in 0...game.height)
           <li>
@@ -120,6 +119,9 @@ class GameView extends View {
           </li>
         }
       </ul>
+      {for (u in game.units)
+        <UnitView unit={u} />
+      }
     </div>
   ;
 }

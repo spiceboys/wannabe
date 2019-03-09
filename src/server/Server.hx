@@ -29,10 +29,6 @@ class Server {
         trace('[room-$id] Room created');
         final room = new game.Game.GameOf<Player>({
           id: id,
-          width: 20,
-          tiles: [],//TODO: fill
-          units: [],
-          players: []
         });
         rooms[id] = room;
       }
@@ -59,6 +55,10 @@ class Server {
         if (terminate) ws.terminate();
       }    
 
+      function broadcast(msg)
+        for (p in room.players)
+          p.send(msg);
+
       function report<T>(p:Promise<T>):Future<T>
         return p.recover(function (e) {
           respond(Panic(e.message));
@@ -66,8 +66,12 @@ class Server {
         }).eager();      
 
       function roomChanged() {
-        for (p in room.players)
-          p.send(RoomChanged(room.players.toArray()));
+        broadcast(RoomChanged(room.players.toArray()));
+
+        if (!room.running && room.players.count(p -> p.ready) == room.players.length && room.players.length > 1) {
+          broadcast(GameStarted(room.startGame()));
+        }
+
       }
       
       ws.on("message", function (json) {
@@ -76,7 +80,7 @@ class Server {
           switch msg {
             case JoinRoom(id, init):
               room = getRoom(id);
-              player = tink.Anon.merge(init, ready = false, disconnect = disconnect.bind(true), send = respond);
+              player = tink.Anon.merge(init, disconnect = disconnect.bind(true), send = respond);
               report(room.addPlayer(player)).handle(roomChanged);
             default: 
               respond(Panic('must join room before any other action'));
@@ -87,12 +91,7 @@ class Server {
             respond(Panic('already joined a room'));
           case SetReady(ready):
             player = tink.Anon.merge(player, ready = ready);
-            report(room.changePlayer(player)).handle(function () {
-              roomChanged();
-              if (room.players.count(p -> p.ready) == room.players.length && room.players.length > 1) {
-                GameStarted(room.startGame());
-              }
-            });
+            report(room.changePlayer(player)).handle(roomChanged);
           case Forfeit:
             disconnect(true);
             roomChanged();
@@ -111,7 +110,6 @@ class Server {
 typedef Room = game.Game.GameOf<Player>;
 
 typedef Player = game.Player & {
-  final ready:Bool;
   function send(msg:game.Protocol.ServerMessage):Void;
   function disconnect():Void;
 }

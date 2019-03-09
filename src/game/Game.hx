@@ -9,15 +9,15 @@ typedef Game = GameOf<Player>;
 class GameOf<TPlayer:Player> implements Model {
   
   @:constant var id:String;
-  @:constant var width:Int;
+  @:observable var width:Int = @byDefault 0;
   @:computed var height:Int = Math.ceil(tiles.length / width);
 
   @:observable var running:Bool = false;
   @:constant var service:PlayerId->Action->Promise<Array<Reaction>> = runLocally;
 
-  @:observable private var tiles:Slice<Tile>;
-  @:observable var players:List<TPlayer>;
-  @:observable var units:List<Unit>;
+  @:observable private var tiles:Slice<Tile> = @byDefault [];
+  @:observable var players:List<TPlayer> = @byDefault null;
+  @:observable var units:List<Unit> = @byDefault null;
 
   @:computed var nextUnit:Option<Unit> = {
 
@@ -76,6 +76,16 @@ class GameOf<TPlayer:Player> implements Model {
     }
   }
 
+  #else
+  @:transition private function startGame(init:GameInit)
+    return @patch {
+      running: true,
+      width: init.width,
+      tiles: [for (t in init.tiles) new Tile({ kind: t })],
+    };
+
+  @:transition private function updatePlayers(players:Array<TPlayer>) 
+    return { players: List.fromArray(players) };
   #end
 
   @:computed @:skipCheck private var pathFinder:pathfinder.Pathfinder = new pathfinder.Pathfinder(this);
@@ -150,4 +160,5 @@ class GameOf<TPlayer:Player> implements Model {
             pathFinder.createPath(origin, new Coordinate(x, y), (tileX, tileY)->unit.canEnter(getTile(tileX, tileY).kind), false, true, unit.speed) != null }
     ];
   }
+
 }

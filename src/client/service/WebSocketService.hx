@@ -13,7 +13,7 @@ class WebSocketService {
 	public var isConnected(get, never):Observable<Bool>;
 	function get_isConnected() return _isConnected.observe();
 
-	var connector:WebSocketConnector;
+	public var connector(default, null):WebSocketConnector;
 
 	public function new(url:String) {
 		this.url = url;
@@ -59,6 +59,7 @@ class WebSocketService {
 	@:signal var onConnected:Noise;
 	@:signal var onDisconnected:{code:Int, reason:String};
 	@:signal var onMessage:Dynamic;
+	@:signal var onRawMessage:String;
 	@:signal var onError:String;
 	
 	@:forward(url, close)
@@ -71,6 +72,7 @@ class WebSocketService {
 		ws.onerror = (e:Event) -> _onError.trigger("WebSocket error");
 		ws.onmessage = (e:MessageEvent) -> {
 			var obj:Dynamic;
+			_onRawMessage.trigger(e.data);
 			try {
 				obj = Json.parse(e.data);
 			}
@@ -81,9 +83,13 @@ class WebSocketService {
 			_onMessage.trigger(obj);
 		}
 	}
-	
-	public function send(obj:Dynamic) {
-		if (ws.readyState == 1) ws.send(Json.stringify(obj));
+
+	public function sendRaw(msg:String) {
+		if (ws.readyState == 1) ws.send(msg);
 		else _onError.trigger('WebSocket is not ready: readyState=${ws.readyState}');
+	}
+
+	public function send(obj:Dynamic) {
+		sendRaw(Json.stringify(obj));
 	}
 }

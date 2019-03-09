@@ -14,8 +14,7 @@ enum ClientMessage {
 }
 
 enum ServerMessage {
-  // RoomJoined(players:Array<LobbyPlayer>);
-  RoomChanged(players:Array<LobbyPlayer>);
+  RoomChanged(players:Array<Player>);
   GameStarted(init:GameInit);
   GameReaction(reactions:Array<Reaction>);
   Panic(error:String);
@@ -30,8 +29,4 @@ typedef GameInit = {
 typedef UnitInit = UnitStatus & {
   final id:UnitId;
   final owner:PlayerId;
-}
-
-typedef LobbyPlayer = Player & {
-  final ready:Bool;
 }

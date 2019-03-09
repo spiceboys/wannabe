@@ -4,5 +4,6 @@ enum TileKind {
   TLava;
   TLand;
   TMountain;
+  TRock;
   TVoid;
 }

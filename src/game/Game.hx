@@ -214,8 +214,8 @@ class GameOf<TPlayer:Player> implements Model {
   public function getTargetTilesFor(unit:Unit):List<TileInfo> {
     var origin = new Coordinate(unit.x, unit.y);
     return [
-      for (x in unit.x - unit.speed...unit.x + unit.speed + 1)
-        for (y in unit.y - unit.speed...unit.y + unit.speed + 1) if(Math.abs(unit.x - x) + Math.abs(y - unit.y) <= unit.speed)
+      for (x in Std.int(Math.max(unit.x - unit.speed, 0))...Std.int(Math.min(unit.x + unit.speed + 1, width)))
+        for (y in Std.int(Math.max(unit.y - unit.speed, 0))...Std.int(Math.min(unit.y + unit.speed + 1, height))) if(Math.abs(unit.x - x) + Math.abs(y - unit.y) <= unit.speed)
           { x: x, y: y, available: unit.canEnter(getTile(x, y).kind) && !units.exists(u -> u.x == x && u.y == y) &&
             pathFinder.createPath(origin, new Coordinate(x, y), (tileX, tileY)->unit.canEnter(getTile(tileX, tileY).kind), false, true, unit.speed) != null }
     ];

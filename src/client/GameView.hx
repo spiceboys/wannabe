@@ -60,6 +60,12 @@ class GameView extends View {
 
   static var MOUNTAIN = TILE.add(css({
     background: '#444',
+    backgroundImage: 'url(../assets/stone_1.png)',
+  }));
+
+  static var ROCK = TILE.add(css({
+    background: '#444',
+    backgroundImage: 'url(../assets/stone_2.png)',
   }));
 
   static var VOID = TILE.add(css({
@@ -99,6 +105,7 @@ class GameView extends View {
                   case _: LAVA_CELL;
                 }
               case TMountain: MOUNTAIN;
+              case TRock: ROCK;
               case TLand: 
                 if ((x + y) % 2 == 0) LAND1 else LAND2;
               case TVoid: VOID;

@@ -20,7 +20,8 @@ class GameOf<TPlayer:Player> implements Model {
   @:observable var units:List<Unit> = @byDefault null;
 
   public function canAttack(attacker:Unit, target:Unit)
-    return true;
+    return attacker != target && attacker.owner != target.owner && 
+      Math.sqrt(Math.pow(attacker.y - target.y, 2) + Math.pow(attacker.x - target.x, 2)) <= Math.sqrt(Math.pow(attacker.status.range, 2) * 2);
 
   public function computeDamage(attacker:Unit, target:Unit)
     return 1;

@@ -1,18 +1,24 @@
 package client.service;
 
 import haxe.Json;
-import js.html.CloseEvent;
-import js.html.Event;
-import js.html.MessageEvent;
-import js.html.WebSocket;
+import js.html.*;
+import tink.state.*;
 
 class WebSocketService {
 	final url:String;
+	final routes:Map<String, Dynamic->Void>;
+
+	final _isConnected:State<Bool> = new State(false);
+
+	public var isConnected(get, never):Observable<Bool>;
+	function get_isConnected() return _isConnected.observe();
 
 	var connector:WebSocketConnector;
 
-	public function new(url:String)
+	public function new(url:String) {
 		this.url = url;
+		routes = [];
+	}
 	
 	function connectWS():Promise<Noise>
 		return Future.async(cb -> {
@@ -21,17 +27,22 @@ class WebSocketService {
 			connector.onConnected.nextTime()
 				.handle(() -> {
 					trace('connector connected');
+					_isConnected.set(true);
 					cb(Success(Noise));
 				});
 			
 			connector.onDisconnected.nextTime()
 				.handle(res -> {
 					trace('connector closed: code=${res.code} reason=${res.reason}');
+					_isConnected.set(false);
 					cb(Failure(new Error('Disconnected: code=${res.code} reason=${res.reason}')));
 				});
 			
 			connector.onError.handle(error -> trace('connector error: $error'));
 		});
+
+	function createSignal<T>(route:String):Signal<T>
+		return Signal.generate(cb -> routes[route] = cb);
 
 	function call(route:String, ?data:Dynamic = null):Void 
 		connector.send({call: route, data: data});
@@ -42,17 +53,6 @@ class WebSocketService {
 				.handle(msg -> cb(msg.data));
 			call(route, data);
 		});
-
-	// function greet()
-	// 	return Future.async(cb -> {
-	// 		connector.onMessage.nextTime(obj -> obj.ready).handle(_ -> {
-	// 			trace("Received ready message");
-	// 			// state.otherPlayerReady = true;
-	// 			cb(Noise);
-	// 		});
-	// 		trace("Sending greetings");
-	// 		connector.send({greetings: true, who: playerId});
-	// 	});
 }
 
 @:tink private class WebSocketConnector {

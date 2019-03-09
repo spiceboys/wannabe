@@ -34,9 +34,9 @@ class GameView extends View {
   static var TILE = css({
     width: '90px',
     height: '60px',
-    outlineOffset: '-2px',
     flexGrow: '0',
     flexShrink: '0',
+    position: 'relative',
   });
 
   static var LAVA_MIDDLE = TILE.add(css({
@@ -77,22 +77,27 @@ class GameView extends View {
     background: 'black',
   }));
 
-  static var AVAILABLE = css({
-    outline: '2px solid lime',
-    cursor: 'pointer'
+  static var HIGHLIGHT = css({
+    position: 'absolute',
+    top: '0',
+    bottom: '0',
+    left: '0',
+    right: '0',
+    border: '2px solid black',
+    borderStyle: 'dashed',
   });
 
-  static var UNAVAILABLE = css({
-    outline: '2px solid red',
-    cursor: 'not-allowed'
-  });
+  static var AVAILABLE = HIGHLIGHT.add(css({
+    cursor: 'pointer',
+    backgroundColor: 'rgba(0, 200, 0, 0.25)',
+    borderColor: 'rgba(0, 255, 0, 0.45)',
+  }));
 
-  function showAvailability(t:Tile):ClassName
-    return 
-      if (availableTiles.exists(t))
-        if (availableTiles[t]) AVAILABLE;
-        else UNAVAILABLE;
-      else null;
+  static var UNAVAILABLE = HIGHLIGHT.add(css({
+    cursor: 'not-allowed',
+    backgroundColor: 'rgb(200, 0, 0, 0.25)',
+    borderColor: 'rgba(255, 0, 0, 0.45)',
+  }));
 
   function renderTile(x, y) {
     var t = game.getTile(x, y);
@@ -100,24 +105,22 @@ class GameView extends View {
     return 
       <div 
         class={
-          showAvailability(t).add(
-            switch t.kind {
-              case TLava: 
-                function getKind(delta)
-                  return game.getTile(x, y + delta).kind;
-                switch [getKind(-1), getKind(1)] {
-                  case [TLava | TVoid, TLava | TVoid]: LAVA_MIDDLE;
-                  case [_, TLava | TVoid]: LAVA_TOP;
-                  case [TLava | TVoid, _]: LAVA_BOTTOM;
-                  case _: LAVA_CELL;
-                }
-              case TMountain: MOUNTAIN;
-              case TRock: ROCK;
-              case TLand: 
-                if ((x + y) % 2 == 0) LAND1 else LAND2;
-              case TVoid: VOID;
-            }
-          )
+          switch t.kind {
+            case TLava: 
+              function getKind(delta)
+                return game.getTile(x, y + delta).kind;
+              switch [getKind(-1), getKind(1)] {
+                case [TLava | TVoid, TLava | TVoid]: LAVA_MIDDLE;
+                case [_, TLava | TVoid]: LAVA_TOP;
+                case [TLava | TVoid, _]: LAVA_BOTTOM;
+                case _: LAVA_CELL;
+              }
+            case TMountain: MOUNTAIN;
+            case TRock: ROCK;
+            case TLand: 
+              if ((x + y) % 2 == 0) LAND1 else LAND2;
+            case TVoid: VOID;
+          }
         }
         onclick={
           if (availableTiles[t]) 
@@ -127,6 +130,12 @@ class GameView extends View {
             }
         }
       >
+        {
+          if (availableTiles.exists(t))
+            if (availableTiles[t]) <div class={AVAILABLE} />
+            else <div class={UNAVAILABLE} />
+          else null
+        }
       </div>;
   }
 

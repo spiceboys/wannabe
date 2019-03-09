@@ -251,8 +251,6 @@ class Pathfinder
 				{
 					_isCompleted = true;
 				}
-				if (_isCompleted)
-				trace(l_currentNode.x, l_currentNode.y, l_currentNode.g, l_currentNode.f, searchCost, _openList.length);
 			} while (!_isCompleted && _openList.length > 0 && l_currentNode.f > searchCost);
 			if ( _openList.length == 0 )
 			{

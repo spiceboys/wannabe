@@ -20,7 +20,7 @@ class GameView extends View {
     default: new Map();
   }
 
-  static var PLAYER_COLORS = [
+  static final PLAYER_COLORS = [
     '#fcbe1c', 
     '#59e334',
     '#f91ffc',
@@ -35,18 +35,18 @@ class GameView extends View {
     return '#888';
   }
 
-  static var ROOT = css({
+  static final ROOT = css({
     position: 'relative',
   });
 
-  static var GRID = css({
+  static final GRID = css({
     listStyle: 'none',
     '& > *': {
       display: 'flex',
     }
   });
 
-  static var ACTIONS = css({
+  static final ACTIONS = css({
     position: 'fixed',
     bottom: '10px',
     right: '10px',
@@ -55,11 +55,12 @@ class GameView extends View {
     }
   });
 
-  static var SCORE = css({
+  static final SCORE = css({
     position: 'fixed',
     top: '20px',
     left: '20px',
     right: '20px',
+    zIndex: '1000',
     pointerEvents: 'none',
     display: 'flex',
     padding: '20px',
@@ -68,7 +69,7 @@ class GameView extends View {
     color: 'white',
   });
 
-  static var NOTIFICATIONS = css({
+  static final NOTIFICATIONS = css({
     position: 'fixed',
     bottom: '10px',
     left: '50%',
@@ -85,6 +86,9 @@ class GameView extends View {
       </ul>
       {for (u in game.units)
         <UnitView unit={u} key={u} color={getPlayerColor(u.owner.id)} />
+      }
+      {for (j in game.jewels)
+        <JewelView jewel={j} />
       }
       <Isolated>
         <div class={SCORE}>
@@ -112,7 +116,7 @@ class GameView extends View {
             switch game.winner {
               case Some(winner): 
                 if (winner.id == game.self.id) "You Rule!";
-                else 'You Suck! ${winner.name} Rules!';
+                else "You Suck! " + winner.name + " Rules!";
               case None:
                 if (game.survivingPlayers.exists(p -> p.id == game.self.id)) "";
                 else "You Suck!";

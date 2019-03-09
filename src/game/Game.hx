@@ -26,6 +26,7 @@ class GameOf<TPlayer:Player> implements Model {
   @:observable private var tiles:Slice<Tile> = @byDefault [];
   @:observable var players:List<TPlayer> = @byDefault null;
   @:observable var units:List<Unit> = @byDefault null;
+  @:observable var jewels:List<Jewel> = @byDefault null;
 
   @:computed var survivingPlayers:List<TPlayer> = 
     players.filter(p -> units.exists(u -> u.owner.id == p.id));
@@ -396,14 +397,19 @@ class GameOf<TPlayer:Player> implements Model {
         }
       case SpawnGem(u):
         unitKilled(u);
+        spawnGem(u.x, u.y);
         case CollectGem(_, _): throw "Please, implement me before you die";
     }
     return reactions;
   }
 
   @:transition private function unitKilled(u:Unit) {
-    trace("unitKilled", u.id);
     return {units: units.filter(cu -> cu.id != u.id)};
+  }
+
+  @:transition private function spawnGem(x:Int, y:Int) {
+    var jewelList:Array<JewelKind> = [Red, Blue, Yellow, Purple];
+    return {jewels: jewels.concat([new Jewel({kind: jewelList[Std.random(jewelList.length)], x: x, y: y})])};
   }
 
   public function dispatch(p:PlayerId, action:Action) {

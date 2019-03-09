@@ -5,7 +5,7 @@ import game.Protocol;
 
 class Remote {
 	
-	static public function connect(url:String, player:Player, id:RoomId):Promise<Game> {
+	static public function connect(url:String, player:Player, id:RoomId):Promise<GameConnection> {
 		var svc = new WebSocketService(url);
 		
 		return @:privateAccess svc.connectWS().next(
@@ -37,7 +37,7 @@ class Remote {
 								case Panic(error):
 									js.Browser.console.error('server error: $error');
 							});
-							game;
+							{ game: game, send: send };
 						default:
 							new Error('unexpected response');
 					}
@@ -47,4 +47,9 @@ class Remote {
 		).eager();
 	}
 
+}
+
+typedef GameConnection = {
+	final game:Game;
+	final send:ClientMessage->Void;
 }

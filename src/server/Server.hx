@@ -91,22 +91,27 @@ class Server {
               respond(Panic('must join room before any other action'));
               disconnect(true);
           }
-        else switch msg {
-          case JoinRoom(_):
-            respond(Panic('already joined a room'));
-          case SetReady(ready):
-            player = tink.Anon.merge(player, ready = ready);
-            report(room.changePlayer(player)).handle(roomChanged);
-          case Forfeit:
-            disconnect(true);
-            roomChanged();
-          case GameAction(action):
-            report(room.dispatch(player.id, action))
-              .handle(function (reactions) {
-                for (p in room.players)
-                  p.send(GameReaction(reactions));
-              });
-        }
+        else 
+          switch msg {
+            case JoinRoom(_):
+              respond(Panic('already joined a room'));
+            case SetPlayerDetails(name, house):
+              // player = tink.Anon.merge(player, name = name, house = house, ready = true); // DEBUG: `ready = true` just for testing
+              player = tink.Anon.merge(player, name = name, house = house); // DEBUG: `ready = true` just for testing
+              report(room.changePlayer(player)).handle(roomChanged);
+            case SetReady(ready):
+              player = tink.Anon.merge(player, ready = ready);
+              report(room.changePlayer(player)).handle(roomChanged);
+            case Forfeit:
+              disconnect(true);
+              roomChanged();
+            case GameAction(action):
+              report(room.dispatch(player.id, action))
+                .handle(function (reactions) {
+                  for (p in room.players)
+                    p.send(GameReaction(reactions));
+                });
+          }
       });
     });
   }

@@ -8,6 +8,7 @@ typedef RoomId = String;
 
 enum ClientMessage {
   JoinRoom(id:RoomId, player:Player);
+  SetPlayerDetails(name:String, house:House);
   SetReady(isReady:Bool);
   GameAction(action:Action);
   Forfeit;

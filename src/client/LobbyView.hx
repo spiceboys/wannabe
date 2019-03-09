@@ -5,23 +5,32 @@ import client.Css.make in css;
 class LobbyView extends View {
   
   @:attribute var players:List<Player>;
-  @:attribute var self:PlayerId;
+  @:attribute var self:Player;
+  @:attribute var setReady:Bool->Void;
   
-  @:computed var isAdmin:Bool = switch players.first() {
-    case Some(p): p.id == self;
-    default: false;
-  }
-
-  static var ADMIN = css({
-    background: 'red',
-  });
   static var SELF = css({
     border: 'green',
   });
 
-  function renderPlayer(p:Player, index:Int) 
-    return <li class={[ADMIN => index == 0, SELF => p.id == self]}>
-      {p.name}
+  function toggleReady()
+    setReady(!self.ready);
+
+  function renderReady(ready:Bool, onclick)
+    return <div onclick={onclick}>
+      <if {ready}>
+        Ready
+      <else>
+        Not Ready
+      </if>
+    </div>
+  ;
+
+  function renderPlayer(p:Player, index:Int)
+    return <li class={[SELF => p.id == self.id]}>
+      <div>{p.name}</div>
+      <div>{Std.string(p.house)}</div>
+      {renderReady(p.ready, toggleReady)}
+      <br />
     </li>
   ;
 

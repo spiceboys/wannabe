@@ -74,6 +74,11 @@ class Server {
 
       }
       
+      ws.on("close", (code, reason) -> {
+        trace('WebSocket disconnected: code=${code} reason=${reason}');
+        disconnect();
+      });
+
       ws.on("message", function (json) {
         final msg:ClientMessage = Json.parse(json);
         if (room == null)

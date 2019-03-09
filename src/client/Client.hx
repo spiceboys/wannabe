@@ -18,6 +18,7 @@ class Client {
     var game = new GameSession({
       self: players[0],
       game: new Game({
+        id: 'yo',
         width: size,
         players: players,
         units: [

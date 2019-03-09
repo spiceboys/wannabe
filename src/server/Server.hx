@@ -3,7 +3,6 @@ package server;
 import haxe.Json;
 import haxe.ds.Map;
 import js.npm.ws.WebSocket;
-import server.Root;
 import game.Protocol;
 
 class Server {
@@ -110,3 +109,9 @@ class Server {
 }
 
 typedef Room = game.Game.GameOf<Player>;
+
+typedef Player = game.Player & {
+  final ready:Bool;
+  function send(msg:game.Protocol.ServerMessage):Void;
+  function disconnect():Void;
+}

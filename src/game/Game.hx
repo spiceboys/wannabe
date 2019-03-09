@@ -81,17 +81,78 @@ class GameOf<TPlayer:Player> implements Model {
         for (s in 0...size * size)
           new Tile({ kind: tiles[Std.random(tiles.length)]})
       ],
-      units: [
+      units: getChosenUnits(players),
+    }
+  }
+
+  function getChosenUnits(players:Array<TPlayer>)
+    return [for (p in players) for (u in getHouseUnits(p)) u];
+
+  function getHouseUnits(player:Player)
+    return switch player.house {
+      case HOctopus: [
         new Unit({
-          owner: players[0],
+          owner: player,
           id: new UnitId(),
-          kind: switch players[0].house {
-            case HRobot: Robot1;
-            case HPenguin: Penguin1;
-            case HOctopus: Octopus1;
-          },
+          kind: Octopus1,
+          status: {
+            range: 2,
+            moved: false,
+            delay: 0,
+            hitpoints: 15,
+            maxHitpoints: 15,
+            x: 10,
+            y: 5,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 3,
+          }
+        }),
+        new Unit({
+          owner: player,
+          id: new UnitId(),
+          kind: Octopus2,
           status: {
             range: 1,
+            moved: false,
+            delay: 0,
+            hitpoints: 15,
+            maxHitpoints: 15,
+            x: 10,
+            y: 5,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 2,
+          }
+        }),
+        new Unit({
+          owner: player,
+          id: new UnitId(),
+          kind: Octopus3,
+          status: {
+            range: 3,
+            moved: false,
+            delay: 0,
+            hitpoints: 15,
+            maxHitpoints: 15,
+            x: 10,
+            y: 5,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 2,
+          }
+        }),
+      ];
+      case HRobot: [
+        new Unit({
+          owner: player,
+          id: new UnitId(),
+          kind: Robot1,
+          status: {
+            range: 4,
             moved: false,
             delay: 0,
             hitpoints: 10,
@@ -101,34 +162,104 @@ class GameOf<TPlayer:Player> implements Model {
             frequency: 1,
             canFly: false,
             canSwim: false,
-            speed: 6,
+            speed: 5,
           }
         }),
         new Unit({
-          owner: players[1],
+          owner: player,
           id: new UnitId(),
-          kind: switch players[1].house {
-            case HRobot: Robot1;
-            case HPenguin: Penguin1;
-            case HOctopus: Octopus1;
-          },
+          kind: Robot2,
           status: {
+            range: 2,
             moved: false,
             delay: 0,
-            range: 7,
-            hitpoints: 5,
-            maxHitpoints: 5,
+            hitpoints: 12,
+            maxHitpoints: 12,
             x: 10,
-            y: 15,
+            y: 5,
             frequency: 1,
             canFly: false,
             canSwim: false,
-            speed: 6,
+            speed: 3,
           }
-        })         
-      ]
+        }),
+        new Unit({
+          owner: player,
+          id: new UnitId(),
+          kind: Robot3,
+          status: {
+            range: 4,
+            moved: false,
+            delay: 0,
+            hitpoints: 11,
+            maxHitpoints: 11,
+            x: 10,
+            y: 5,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 2,
+          }
+        }),
+      ];
+      case HPenguin: [
+        new Unit({
+          owner: player,
+          id: new UnitId(),
+          kind: Penguin1,
+          status: {
+            range: 1,
+            moved: false,
+            delay: 0,
+            hitpoints: 14,
+            maxHitpoints: 14,
+            x: 10,
+            y: 5,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 4,
+          }
+        }),
+        new Unit({
+          owner: player,
+          id: new UnitId(),
+          kind: Penguin2,
+          status: {
+            range: 5,
+            moved: false,
+            delay: 0,
+            hitpoints: 11,
+            maxHitpoints: 11,
+            x: 10,
+            y: 5,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 2,
+          }
+        }),
+        new Unit({
+          owner: player,
+          id: new UnitId(),
+          kind: Penguin3,
+          status: {
+            range: 3,
+            moved: false,
+            delay: 0,
+            hitpoints: 12,
+            maxHitpoints: 12,
+            x: 10,
+            y: 5,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 3,
+          }
+        }),
+      ];
     }
-  }
+
   public function startGame():GameInit {
     _startGame();
     return {

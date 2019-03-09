@@ -95,7 +95,7 @@ class Game implements Model {
     return [
       for (x in unit.x - unit.speed...unit.x + unit.speed + 1)
         for (y in unit.y - unit.speed...unit.y + unit.speed + 1) if(Math.abs(unit.x - x) + Math.abs(y - unit.y) <= unit.speed)
-          { x: x, y: y, available: unit.canEnter(getTile(x, y).kind) && !(unit.x == x && unit.y == y) && 
+          { x: x, y: y, available: unit.canEnter(getTile(x, y).kind) && !units.exists(u -> u.x == x && u.y == y) &&
             pathFinder.createPath(origin, new Coordinate(x, y), (tileX, tileY)->unit.canEnter(getTile(tileX, tileY).kind), false, true, unit.speed) != null }
     ];
   }

@@ -8,6 +8,7 @@ typedef Game = GameOf<Player>;
 
 class GameOf<TPlayer:Player> implements Model {
   
+  @:skipCheck var obstacles:Array<Array<Int>> = [[10,11],[],[],[],[],[],[10],[9,10,11,12,19],[2,12,13,18,19,20],[1,2,3,4,13,19,20],[3,13,14,20],[7,8,14],[8,9,13,14],[9,12,13],[10,11,12],[10],[],[],[],[]];
   @:constant var id:String;
   @:observable var width:Int = @byDefault 0;
   @:computed var height:Int = Math.ceil(tiles.length / width);
@@ -77,12 +78,21 @@ class GameOf<TPlayer:Player> implements Model {
     return @patch { 
       width: size,
       running: true,
-      tiles: [
-        for (s in 0...size * size)
-          new Tile({ kind: tiles[Std.random(tiles.length)]})
-      ],
+      tiles: createMapTiles(size),
       units: getChosenUnits(players),
     }
+  }
+
+  function createMapTiles(size:Int):Array<Tile> {
+    var out = [];
+    for (i in 0...obstacles.length) {
+      for (j in 0...size)
+        if (obstacles[i].indexOf(j + 1) != -1)
+          out.push(new Tile({ kind: TileKind.TLava}));
+        else
+          out.push(new Tile({ kind: TileKind.TLand}));
+    }
+    return out;
   }
 
   function getChosenUnits(players:Array<TPlayer>)

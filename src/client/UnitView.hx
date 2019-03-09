@@ -6,7 +6,7 @@ using StringTools;
 
 class UnitView extends View {
   @:attribute var unit:Unit;
-  @:attribute var color:Int = 0x00AA00;
+  @:attribute var color:String;
   function getClass()
     return switch unit.kind {
       case Robot1: ROBOT_1;
@@ -23,8 +23,8 @@ class UnitView extends View {
   @:computed var transform:String = 'translate(${unit.x * 90}px, ${unit.y * 60}px)';
 
   function render()
-    return <div class={getClass()} style={{ transform: transform }}>
-      <div class={HEALTHBAR} style={{ background: '#' + color.hex(6) }}>
+    return <div class={getClass()} style={{ transform: transform, zIndex: Std.string(unit.y) }}>
+      <div class={HEALTHBAR} style={{ background: color }}>
         <div style={{ height: '100%', width: 100 * (1 - unit.hitpoints / unit.maxHitpoints) + '%'}} />
       </div>
     </div>;

@@ -27,8 +27,13 @@ class GameView extends View {
     '#dffc18',
   ];
 
-  function getPlayerColor(p:Player)
-    return PLAYER_COLORS[Lambda.indexOf(game.players, p)];
+  function getPlayerColor(p:PlayerId) {
+    var players = game.players.toArray();
+    for (i in 0...players.length)
+      if (players[i].id == p)
+        return PLAYER_COLORS[i];
+    return '#888';
+  }
 
   static var ROOT = css({
     position: 'relative',
@@ -79,12 +84,12 @@ class GameView extends View {
         }
       </ul>
       {for (u in game.units)
-        <UnitView unit={u} />
+        <UnitView unit={u} color={getPlayerColor(u.owner.id)} />
       }
       <Isolated>
         <div class={SCORE}>
           {for (p in game.players)
-            <div style={{ color: getPlayerColor(p) }}>{p.name}: {p.jewels}</div>
+            <div style={{ color: getPlayerColor(p.id) }}>{p.name}: {p.jewels}</div>
           }
         </div>
       </Isolated>

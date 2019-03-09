@@ -137,6 +137,12 @@ class GameView extends View {
     }
   });
 
+  static var NOTIFICATIONS = css({
+    position: 'fixed',
+    bottom: '10px',
+    left: '50%',
+  });
+
   function render()
     return <div class={ROOT}>
       <ul class={GRID}>
@@ -158,6 +164,16 @@ class GameView extends View {
                 default: 'Skip Attack';
               }
             }</button>
+        }
+      </div>
+      <div class={NOTIFICATIONS}>
+        {
+          switch [game.players.count(p -> p.jewels != 0), game.self.jewels] {
+            case [1, 0]: "Game Over";
+            case [1, _]: "You are the fucking king";
+            case [_, 0]: "You Lose!";
+            case _: "";
+          }
         }
       </div>
     </div>

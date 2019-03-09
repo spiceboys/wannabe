@@ -14,6 +14,7 @@ class Client {
       name: new PlayerId(),
       house: null,
       ready: true,
+      jewels: 1,
     };
     client.service.Remote.connect(
       "ws://localhost:2751", 

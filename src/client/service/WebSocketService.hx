@@ -45,7 +45,6 @@ class WebSocketService {
 @:tink private class WebSocketConnector {
 	@:signal var onConnected:Noise;
 	@:signal var onDisconnected:{code:Int, reason:String};
-	@:signal var onMessage:Dynamic;
 	@:signal var onRawMessage:String;
 	@:signal var onError:String;
 	
@@ -60,14 +59,6 @@ class WebSocketService {
 		ws.onmessage = (e:MessageEvent) -> {
 			var obj:Dynamic;
 			_onRawMessage.trigger(e.data);
-			try {
-				obj = Json.parse(e.data);
-			}
-			catch (err:Dynamic) {
-				_onError.trigger("JSON parse error");
-				return;
-			}
-			_onMessage.trigger(obj);
 		}
 	}
 

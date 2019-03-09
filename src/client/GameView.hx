@@ -13,6 +13,10 @@ class GameView extends View {
     default: new Map();
   }
 
+  static var ROOT = css({
+    position: 'relative',
+  });
+  
   static var GRID = css({
     listStyle: 'none',
     '& > *': {
@@ -26,7 +30,6 @@ class GameView extends View {
     outlineOffset: '-2px',
     flexGrow: '0',
     flexShrink: '0',
-    position: 'relative',
   });
 
   static var LAVA_MIDDLE = TILE.add(css({
@@ -59,65 +62,6 @@ class GameView extends View {
 
   static var VOID = TILE.add(css({
     background: 'black',
-  }));
-
-  static var UNIT = css({
-    position: 'absolute',
-    bottom: '0px',
-  });
-
-  static var ROBOT_1 = UNIT.add(css({
-    backgroundImage: 'url(../assets/robot_1.png)',
-    width: '73px',
-    height: '142px',
-  }));
-
-  static var ROBOT_2 = UNIT.add(css({
-    backgroundImage: 'url(../assets/robot_2.png)',
-    width: '85px',
-    height: '112px',
-  }));
-
-  static var ROBOT_3 = UNIT.add(css({
-    backgroundImage: 'url(../assets/robot_3.png)',
-    width: '90px',
-    height: '147px',
-  }));
-
-  static var OCTOPUS_1 = UNIT.add(css({
-    backgroundImage: 'url(../assets/octopus_1.png)',
-    width: '99px',
-    height: '136px',
-  }));
-
-  static var OCTOPUS_2 = UNIT.add(css({
-    backgroundImage: 'url(../assets/octopus_2.png)',
-    width: '93px',
-    height: '125px',
-  }));
-
-  static var OCTOPUS_3 = UNIT.add(css({
-    backgroundImage: 'url(../assets/octopus_3.png)',
-    width: '88px',
-    height: '122px',
-  }));
-
-  static var PENGUIN_1 = UNIT.add(css({
-    backgroundImage: 'url(../assets/penguin_1.png)',
-    width: '77px',
-    height: '100px',
-  }));
-
-  static var PENGUIN_2 = UNIT.add(css({
-    backgroundImage: 'url(../assets/penguin_2.png)',
-    width: '116px',
-    height: '100px',
-  }));
-
-  static var PENGUIN_3 = UNIT.add(css({
-    backgroundImage: 'url(../assets/penguin_3.png)',
-    width: '97px',
-    height: '108px',
   }));
 
   static var AVAILABLE = css({
@@ -163,26 +107,11 @@ class GameView extends View {
           if (availableTiles[t]) game.moveTo(x, y)
         }
       >
-        <div class={
-          switch game.getUnit(x, y) {
-            case None: null;
-            case Some(v): switch v.kind {
-              case Robot1: ROBOT_1;
-              case Robot2: ROBOT_2;
-              case Robot3: ROBOT_3;
-              case Octopus1: OCTOPUS_1;
-              case Octopus2: OCTOPUS_2;
-              case Octopus3: OCTOPUS_3;
-              case Penguin1: PENGUIN_1;
-              case Penguin2: PENGUIN_2;
-              case Penguin3: PENGUIN_3;
-            }
-        }}></div>
       </div>;
   }
 
   function render()
-    return <div>
+    return <div class={ROOT}>
       <ul class={GRID}>
         {for (y in 0...game.height)
           <li>
@@ -190,6 +119,9 @@ class GameView extends View {
           </li>
         }
       </ul>
+      {for (u in game.units)
+        <UnitView unit={u} />
+      }
     </div>
   ;
 }

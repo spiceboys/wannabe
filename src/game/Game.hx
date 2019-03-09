@@ -13,7 +13,7 @@ class GameOf<TPlayer:Player> implements Model {
   @:computed var height:Int = Math.ceil(tiles.length / width);
 
   @:observable var running:Bool = false;
-  @:constant var service:PlayerId->Action->Promise<Array<Reaction>> = runLocally;
+  @:constant var service:PlayerId->Action->Promise<Array<Reaction>> = @byDefault runLocally;
 
   @:observable private var tiles:Slice<Tile> = @byDefault [];
   @:observable var players:List<TPlayer> = @byDefault null;
@@ -71,6 +71,7 @@ class GameOf<TPlayer:Player> implements Model {
       units: [
         new Unit({
           owner: players[0],
+          id: new UnitId(),
           kind: Penguin1,
           status: {
             delay: 0,
@@ -85,6 +86,7 @@ class GameOf<TPlayer:Player> implements Model {
         }),
         new Unit({
           owner: players[1],
+          id: new UnitId(),
           kind: Octopus1,
           status: {
             delay: 0,
@@ -116,7 +118,7 @@ class GameOf<TPlayer:Player> implements Model {
       running: true,
       width: init.width,
       tiles: [for (t in init.tiles) new Tile({ kind: t })],
-      units: [for (u in init.units) new Unit({ status: u, owner: players[u.owner], kind: u.kind })],
+      units: [for (u in init.units) new Unit({ status: u, id: u.id, owner: players[u.owner], kind: u.kind })],
     };
   }
 
@@ -153,12 +155,20 @@ class GameOf<TPlayer:Player> implements Model {
       if (u.id == id) return Some(u);
     return None;
   }
+  static final console = 
+    #if nodejs 
+       js.Node.console;
+    #else
+      js.Browser.console;
+    #end
 
   function apply(reactions:Array<Reaction>) {
+    
     for (r in reactions) switch r {
       case UnitUpdate(id, to):
         switch unitById(id) {
-          case None: //TODO: panic or something
+          case None:
+            console.error('unit not found $id');
           case Some(u):
             @:privateAccess u.update(to);
         }

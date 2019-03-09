@@ -1,7 +1,5 @@
 package game;
 
-typedef UnitId = PlayerId;
-
 typedef UnitStatus = {
   final x:Int;
   final y:Int;
@@ -16,14 +14,18 @@ typedef UnitStatus = {
 enum UnitKind {
   Robot1;
   Robot2;
-  Cat1;
+  Robot3;
   Octopus1;
+  Octopus2;
+  Octopus3;
   Penguin1;
+  Penguin2;
+  Penguin3;
 }
 
 class Unit implements Model {
   
-  @:constant var id:UnitId = new UnitId();
+  @:constant var id:UnitId;
   @:constant var owner:Player;
   @:constant var kind:UnitKind;
 

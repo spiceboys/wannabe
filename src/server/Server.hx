@@ -9,13 +9,14 @@ class Server {
   static public final BUILD_DATE = server.util.Macro.getBuildDate();
   static public final HASH = server.util.Macro.getGitSha().substr(0, 8);
 
-  static final port = 2751;
+  static final DEFAULT_PORT = 2751;
 
   static function main() {
     process.chdir(__dirname);
+    final port = if (process.env.exists("PORT")) Std.parseInt(process.env["PORT"]) else DEFAULT_PORT;
     trace('server version $BUILD_DATE compiled on $BUILD_DATE');
     trace('listening on port $port');
-    new Server().run();
+    new Server().run(port);
   }
 
   public function new() {}
@@ -33,7 +34,7 @@ class Server {
         rooms[id] = room;
       }
 
-  public function run() {
+  public function run(port:Int) {
     final wss = new js.npm.ws.Server({port: port});
     wss.on("connection", (ws:WebSocket) -> {
       trace("WebSocket connected");

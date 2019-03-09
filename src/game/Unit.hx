@@ -14,9 +14,13 @@ typedef UnitStatus = {
 enum UnitKind {
   Robot1;
   Robot2;
-  Cat1;
+  Robot3;
   Octopus1;
+  Octopus2;
+  Octopus3;
   Penguin1;
+  Penguin2;
+  Penguin3;
 }
 
 class Unit implements Model {

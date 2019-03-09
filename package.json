@@ -1,9 +1,12 @@
 {
   "name": "wannabe",
   "dependencies": {
-    "lix": "^15.3.5"
+    "lix": "^15.3.5",
+    "nodemon": "^1.18.10"
   },
-  "scripts":{
-    "postinstall": "lix download"
+  "scripts": {
+    "postinstall": "lix download && npm run update-server",
+    "update-server": "cd bin && npm ci",
+    "start": "haxe server.hxml && nodemon bin/server.js"
   }
 }

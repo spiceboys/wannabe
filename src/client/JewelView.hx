@@ -17,7 +17,7 @@ class JewelView extends View {
   @:computed var transform:String = 'translate(${jewel.x * 90}px, ${jewel.y * 60}px)';
 
   function render()
-    return <div class={getClass()} style={transform}>
+    return <div class={getClass()} style={{transform: transform, zIndex: Std.string(jewel.y) }}>
     </div>;
 
   static var JEWEL = css({

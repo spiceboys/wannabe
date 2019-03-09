@@ -12,6 +12,10 @@ class LobbyView extends View {
     color: 'green',
   });
 
+  static var PAGE = css({
+    fontSize: '50px'
+  });
+
   function toggleReady()
     setReady(!self.ready);
 
@@ -41,7 +45,7 @@ class LobbyView extends View {
 
   function render() {
     var players = players.toArray();
-    return <div>
+    return <div class={["foo", PAGE]}>
       <ul>
         {for (i in 0...players.length) renderPlayer(players[i], i)}
       </ul>

@@ -20,7 +20,8 @@ class StartView extends View {
   @:ref var nameInput:js.html.InputElement;
 
   static var SELECTED = css({
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    transform: "scale(1.2, 1.2)"
   });
 
   static var ROBOT = css({
@@ -35,30 +36,88 @@ class StartView extends View {
     color: 'blue',
   });
 
+  static var INPUT = css({
+    marginTop: "40px",
+    fontSize: "35px"
+  });
+
+  static var H1 = css({
+    color: "#f1f1f1",
+    fontSize: "70px"
+  });
+
+  static var PAGE = css({
+    backgroundColor: "#92c16f",
+    height: "100vh",
+    textAlign: "center",
+    padding: "50px"
+  });
+  
+  static var UL = css({
+    display: "flex",
+    justifyContent: "space-evenly",
+    marginTop: "80px"
+  });
+  
+  static var DESC = css({
+    margin: "40px 0",
+    color: "#f1f1f1",
+    fontSize: "80px"
+  });
+
+  static var BTN = css({
+    fontSize: "50px",
+    width: "300px",
+    height: "80px",
+    backgroundColor: "#86e923",
+    borderStyle: "none",
+    borderBottom: "10px solid #60bc03",
+    color: "#f1f1f1",
+    cursor: "pointer"
+  });
+
   function renderHouse(h:House) {
     final cls = switch h {
       case HRobot: ROBOT;
       case HOctopus: OCTOPUS;
       case HPenguin: PENGUIN;
     }
+    
+    final stringVal = switch h {
+      case HRobot: "robot";
+      case HOctopus: "octopus";
+      case HPenguin: "penguin";
+    }
+
+
     return
       <li class={[cls => true, SELECTED => h == house]} onclick={house = h}>
-        {Std.string(h)}
+        <img src={"./assets/select_" + stringVal + ".png"}/>
       </li>
     ;
   }
-
+  function renderDescription() {
+    return switch(house) {
+      case HRobot: "House of Robots";
+      case HOctopus: "House of Octopuses";
+      case HPenguin: "House of Penguins";
+    }
+  }
   function isValidInput()
     return house != null && name.length >= 3;
 
   function render() {
-    return <div>
+    return <div class={[PAGE]}>
+      <h1 class={[H1]}>CHOOSE YOUR HOUSE AND NAME:</h1>
       <form onsubmit={{ event.preventDefault(); setPlayerDetails(name, house); }}>
-        <input ref={nameInput} value={name} oninput={name = event.src.value} placeholder="Player Name" />
-        <ul>
+        <input class={INPUT} ref={nameInput} value={name} oninput={name = event.src.value} placeholder="Player Name" />
+        <ul class={UL}>
           {for (h in [HRobot, HOctopus, HPenguin]) renderHouse(h)}
         </ul>
-        <button disabled={!isValidInput()}>Start</button>
+        <div class={DESC}>
+          {renderDescription()}
+        </div>
+        <button class={BTN} disabled={!isValidInput()}>Start</button>
       </form>
     </div>;
   }

@@ -13,10 +13,19 @@ typedef UnitStatus = {
   final frequency:Float;  
 }
 
+enum UnitKind {
+  Robot1;
+  Robot2;
+  Cat1;
+  Octopus1;
+  Penguin1;
+}
+
 class Unit implements Model {
   
   @:constant var id:UnitId = new UnitId();
   @:constant var owner:Player;
+  @:constant var kind:UnitKind;
 
   @:forward
   @:observable

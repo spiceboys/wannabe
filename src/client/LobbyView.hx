@@ -9,7 +9,7 @@ class LobbyView extends View {
   @:attribute var setReady:Bool->Void;
   
   static var SELF = css({
-    border: 'green',
+    color: 'green',
   });
 
   function toggleReady()
@@ -27,9 +27,14 @@ class LobbyView extends View {
 
   function renderPlayer(p:Player, index:Int)
     return <li class={[SELF => p.id == self.id]}>
-      <div>{p.name}</div>
-      <div>{Std.string(p.house)}</div>
-      {renderReady(p.ready, toggleReady)}
+      <if {p.house != null}>
+        <div>{p.name}</div>
+        <div>{Std.string(p.house)}</div>
+        {renderReady(p.ready, if (p.id == self.id) toggleReady else null)}
+      <else>
+        <div><i>Undecided</i></div>
+        {renderReady(p.ready, null)}
+      </if>
       <br />
     </li>
   ;

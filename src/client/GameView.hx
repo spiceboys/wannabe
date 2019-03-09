@@ -79,7 +79,7 @@ class GameView extends View {
         }
       </ul>
       {for (u in game.units)
-        <UnitView unit={u} />
+        <UnitView unit={u} key={u} />
       }
       <Isolated>
         <div class={SCORE}>

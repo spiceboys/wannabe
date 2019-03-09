@@ -12,7 +12,7 @@ class Client {
     var self:Player = {
       id: new PlayerId(),
       name: new PlayerId(),
-      color: 0,
+      house: null,
       ready: true,
     };
     client.service.Remote.connect(
@@ -36,10 +36,10 @@ class Client {
       case Failure(e): alert(e.message);
     });
     // var players:Array<Player> = [
-    //   { id: new PlayerId(), name: 'Gene', color: 0xFFFF00 },
-    //   { id: new PlayerId(), name: 'Hector', color: 0x000000 },
-    //   { id: new PlayerId(), name: 'Arsen', color: 0x0000FF },
-    //   { id: new PlayerId(), name: 'Juraj', color: 0x00FFFF },
+    //   { id: new PlayerId(), name: 'Gene' },
+    //   { id: new PlayerId(), name: 'Hector' },
+    //   { id: new PlayerId(), name: 'Arsen' },
+    //   { id: new PlayerId(), name: 'Juraj' },
     // ];
 
     // var size = 20;
@@ -62,24 +62,6 @@ class Client {
     //   })
     // });
 
-    // Renderer.mount(
-    //   document.body,
-    //   coconut.Ui.hxx(
-    //     <LobbyView players={players} self={players[0].id} />
-    //   )
-    // );
-
-    // // trace(Std.string(haxe.Json.parse(haxe.Json.stringify(JoinRoom('fo', { id: new PlayerId(), name: 'foobar', color: 0xFF00FF })))));
-    
-    // testWS();
-  }
-
-  static function testWS() {
-    // final playerId = Std.string(Std.random(65536));
-    // new client.service.Remote("ws://localhost:2751", playerId)
-    //   .connect()
-    //   .handle(serverInfo -> {
-    //     trace('connected, serverInfo=$serverInfo');
-    //   });
+    // // trace(Std.string(haxe.Json.parse(haxe.Json.stringify(JoinRoom('fo', { id: new PlayerId(), name: 'foobar' })))));
   }
 }

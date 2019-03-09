@@ -40,19 +40,6 @@ class WebSocketService {
 			
 			connector.onError.handle(error -> trace('connector error: $error'));
 		});
-
-	function createSignal<T>(route:String):Signal<T>
-		return Signal.generate(cb -> routes[route] = cb);
-
-	function call(route:String, ?data:Dynamic = null):Void 
-		connector.send({call: route, data: data});
-
-	function callAndListen(route:String, ?data:Dynamic = null):Promise<Dynamic>
-		return Future.async(cb -> {
-			connector.onMessage.nextTime(msg -> msg.call == '${route}Response')
-				.handle(msg -> cb(msg.data));
-			call(route, data);
-		});
 }
 
 @:tink private class WebSocketConnector {

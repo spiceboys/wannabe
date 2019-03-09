@@ -14,13 +14,21 @@ class LobbyView extends View {
 
   static var H1 = css({
     color: "#f1f1f1",
-    fontSize: "70px"
+    fontSize: "70px",
+    marginBottom: "60px"
+  });
+
+
+  static var BODY = css({
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+    backgroundColor: "rgb(146, 193, 111)",
+    justifyContent: "center"
   });
 
   static var PAGE = css({
     fontSize: '50px',
-    backgroundColor: "#92c16f",
-    height: "100vh",
     textAlign: "center",
     padding: "50px",
     color: "#f1f1f1"
@@ -85,11 +93,13 @@ class LobbyView extends View {
 
   function render() {
     var players = players.toArray();
-    return <div class={[PAGE]}>
-      <h1>GET READY!</h1>
-      <ul class={LIST}>
-        {for (i in 0...players.length) renderPlayer(players[i], i)}
-      </ul>
+    return <div class={[BODY]}>
+      <div class={[PAGE]}>
+        <h1 class={[H1]}>GET READY!</h1>
+        <ul class={LIST}>
+          {for (i in 0...players.length) renderPlayer(players[i], i)}
+        </ul>
+      </div>
     </div>;
   }
 }

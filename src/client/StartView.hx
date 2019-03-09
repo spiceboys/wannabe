@@ -54,12 +54,19 @@ class StartView extends View {
 
   static var H1 = css({
     color: "#f1f1f1",
-    fontSize: "70px"
+    fontSize: "70px",
+    marginBottom: "60px"
+  });
+  
+  static var BODY = css({
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+    backgroundColor: "rgb(146, 193, 111)",
+    justifyContent: "center"
   });
 
   static var PAGE = css({
-    backgroundColor: "#92c16f",
-    height: "100vh",
     textAlign: "center",
     padding: "50px"
   });
@@ -119,18 +126,20 @@ class StartView extends View {
     return house != null && name.length >= 3;
 
   function render() {
-    return <div class={[PAGE]}>
-      <h1 class={[H1]}>CHOOSE YOUR HOUSE AND NAME:</h1>
-      <form onsubmit={{ event.preventDefault(); setPlayerDetails(name, house); }}>
-        <input class={INPUT} ref={nameInput} value={name} oninput={name = event.src.value} placeholder="Player Name" />
-        <ul class={UL}>
-          {for (h in [HRobot, HOctopus, HPenguin]) renderHouse(h)}
-        </ul>
-        <div class={DESC}>
-          {renderDescription()}
-        </div>
-        <button class={BTN} disabled={!isValidInput()}>Start</button>
-      </form>
+    return <div class={[BODY]}>
+      <div class={[PAGE]}>
+        <h1 class={[H1]}>CHOOSE YOUR HOUSE AND NAME:</h1>
+        <form onsubmit={{ event.preventDefault(); setPlayerDetails(name, house); }}>
+          <input class={INPUT} ref={nameInput} value={name} oninput={name = event.src.value} placeholder="Player Name" />
+          <ul class={UL}>
+            {for (h in [HRobot, HOctopus, HPenguin]) renderHouse(h)}
+          </ul>
+          <div class={DESC}>
+            {renderDescription()}
+          </div>
+          <button class={BTN} disabled={!isValidInput()}>Start</button>
+        </form>
+      </div>
     </div>;
   }
 }

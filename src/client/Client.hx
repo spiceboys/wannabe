@@ -53,32 +53,7 @@ class Client {
     //     width: size,
     //     players: players,
     //     units: [
-    //       new Unit({
-    //         owner: players[0],
-    //         status: {
-    //           delay: 0,
-    //           hitpoints: 100,
-    //           x: 10,
-    //           y: 5,
-    //           frequency: 1,
-    //           canFly: false,
-    //           canSwim: false,
-    //           speed: 6,
-    //         }
-    //       }),
-    //       new Unit({
-    //         owner: players[0],
-    //         status: {
-    //           delay: 0,
-    //           hitpoints: 100,
-    //           x: 10,
-    //           y: 15,
-    //           frequency: .25,
-    //           canFly: false,
-    //           canSwim: false,
-    //           speed: 6,
-    //         }
-    //       })          
+         
     //     ],
     //     tiles: [
     //       for (s in 0...size * size)

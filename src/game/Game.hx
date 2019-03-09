@@ -58,8 +58,9 @@ class GameOf<TPlayer:Player> implements Model {
   }
 
   @:transition function _startGame() {
-    var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand, TileKind.TLava],
-        size = 20;
+    var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand],
+        size = 20,
+        players = players.toArray();
     return @patch { 
       width: size,
       running: true,
@@ -67,6 +68,36 @@ class GameOf<TPlayer:Player> implements Model {
         for (s in 0...size * size)
           new Tile({ kind: tiles[Std.random(tiles.length)]})
       ],
+      units: [
+        new Unit({
+          owner: players[0],
+          kind: Penguin1,
+          status: {
+            delay: 0,
+            hitpoints: 100,
+            x: 10,
+            y: 5,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 6,
+          }
+        }),
+        new Unit({
+          owner: players[1],
+          kind: Octopus1,
+          status: {
+            delay: 0,
+            hitpoints: 100,
+            x: 10,
+            y: 15,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 6,
+          }
+        })         
+      ]
     }
   }
   public function startGame():GameInit {
@@ -74,17 +105,20 @@ class GameOf<TPlayer:Player> implements Model {
     return {
       width: width,
       tiles: [for (t in tiles) t.kind],
-      units: [],
+      units: [for (u in units) tink.Anon.merge(u.status, id = u.id, owner = u.owner.id, kind = u.kind)],
     }
   }
 
   #else
-  @:transition private function startGame(init:GameInit)
+  @:transition private function startGame(init:GameInit) {
+    var players = [for (p in players) p.id => p];
     return @patch {
       running: true,
       width: init.width,
       tiles: [for (t in init.tiles) new Tile({ kind: t })],
+      units: [for (u in init.units) new Unit({ status: u, owner: players[u.owner], kind: u.kind })],
     };
+  }
 
   @:transition private function updatePlayers(players:Array<TPlayer>) 
     return { players: List.fromArray(players) };

@@ -28,5 +28,6 @@ typedef GameInit = {
 
 typedef UnitInit = UnitStatus & {
   final id:UnitId;
+  final kind:UnitKind;
   final owner:PlayerId;
 }

@@ -89,13 +89,13 @@ class Pathfinder
 		return switch( p_heuristic )
 		{
 			case DIAGONAL : _getCostDiagonal( p_node1, p_node2 );
-			case PRODUCT : _getCostProduct( _startNode, p_node1, p_node2 );
+			case PRODUCT : _getCostProduct( p_node1, p_node2 );
 			case EUCLIDIAN : _getCostEuclidian( p_node1, p_node2 );
 			case MANHATTAN : _getCostManhattan( p_node1, p_node2 );
 		}
 	}
 
-	private inline function _getCostDiagonal( p_node1:Coordinate, p_node2:Coordinate ):Float
+	private inline function _getCostDiagonal( p_node1:Node, p_node2:Node ):Float
 	{
 		var l_dx:Int = _intAbs( p_node1.x - p_node2.x );
 		var l_dy:Int = _intAbs( p_node1.y - p_node2.y );
@@ -104,12 +104,12 @@ class Pathfinder
 		return ( _COST_ADJACENT * ( l_straight - ( 2 * l_diag ) ) ) + ( _COST_DIAGIONAL * l_diag );
 	}
 
-	private inline function _getCostProduct( startNode:Coordinate, p_node1:Coordinate, p_node2:Coordinate ):Float
+	private inline function _getCostProduct( p_node1:Node, p_node2:Node ):Float
 	{
-		var l_dx1:Int = _intAbs( p_node1.x - p_node2.x );
-		var l_dy1:Int = _intAbs( p_node1.y - p_node2.y );
-		var l_dx2:Int = _intAbs( startNode.x - p_node2.x );
-		var l_dy2:Int = _intAbs( startNode.y - p_node2.y );
+		var l_dx1:Int = _intAbs( p_node1.x - _destNode.x );
+		var l_dy1:Int = _intAbs( p_node1.y - _destNode.y );
+		var l_dx2:Int = _intAbs( _startNode.x - _destNode.x );
+		var l_dy2:Int = _intAbs( _startNode.y - _destNode.y );
 		var l_cross:Float = _intAbs( ( l_dx1 * l_dy2 ) - ( l_dx2 * l_dy1 ) ) * .01;
 		return _getCostDiagonal( p_node1, p_node2 ) + l_cross;
 	}
@@ -171,11 +171,11 @@ class Pathfinder
 	{
 		var l_path:Array<Coordinate> = new Array<Coordinate>();
 		var l_node:Node = _destNode;
-		l_path[0] = l_node/*.clone()*/;
+		l_path[0] = l_node.clone();
 		do
 		{
 			l_node = l_node.parent;
-			l_path.unshift( l_node/*.clone()*/ );
+			l_path.unshift( l_node.clone() );
 			if ( l_node == _startNode )
 			{
 				break;
@@ -243,7 +243,7 @@ class Pathfinder
 				_info.timeElapsed = Std.int( ( Timer.stamp() - l_startTime ) * 1000 );
 				if ( _info.timeElapsed > _timeOutDuration )
 				{
-					return null;
+					//return null;
 				}
 			}
 			_closedList.push( l_currentNode );
@@ -254,7 +254,7 @@ class Pathfinder
 				{
 					_isCompleted = true;
 				}
-			} while (!_isCompleted && _openList.length > 0 && l_currentNode.f > searchCost);
+			} while (!_isCompleted && _openList.length > 0 && l_currentNode.g > searchCost);
 			if ( _openList.length == 0 )
 			{
 				return null;
@@ -262,9 +262,6 @@ class Pathfinder
 		}
 		_info.timeElapsed = Std.int( ( Timer.stamp() - l_startTime ) * 1000 );
 		var l_path = _getPath();
-
-		var sum:Float = 0;
-		//if ((cast l_path[l_path.length - 1]).g > searchCost) return null;
 		_info.pathLength = l_path.length;
 		return l_path;
 	}

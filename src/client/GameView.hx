@@ -26,6 +26,7 @@ class GameView extends View {
     outlineOffset: '-2px',
     flexGrow: '0',
     flexShrink: '0',
+    position: 'relative',
   });
 
   static var LAVA_MIDDLE = TILE.add(css({
@@ -60,6 +61,29 @@ class GameView extends View {
     background: 'black',
   }));
 
+  static var UNIT = css({
+    position: 'absolute',
+    bottom: '0px',
+  });
+
+  static var ROBOT_1 = UNIT.add(css({
+    backgroundImage: 'url(../assets/robot_1.png)',
+    width: '87px',
+    height: '169px',
+  }));
+
+  static var OCTOPUS_1 = UNIT.add(css({
+    backgroundImage: 'url(../assets/unit_2.png)',
+    width: '190px',
+    height: '172px',
+  }));
+
+  static var PENGUIN_1 = UNIT.add(css({
+    backgroundImage: 'url(../assets/penguin_1.png)',
+    width: '77px',
+    height: '100px',
+  }));
+
   static var AVAILABLE = css({
     outline: '2px solid lime'
   });
@@ -79,7 +103,7 @@ class GameView extends View {
     var t = game.getTile(x, y);
     
     return 
-      <td 
+      <div 
         class={
           showAvailability(t).add(
             switch t.kind {
@@ -103,11 +127,17 @@ class GameView extends View {
           if (availableTiles[t]) game.moveTo(x, y)
         }
       >
-        {switch game.getUnit(x, y) {
-          case None: null;
-          case Some(_): 'X';
-        }}
-      </td>;
+        <div class={
+          switch game.getUnit(x, y) {
+            case None: null;
+            case Some(v): switch v.kind {
+              case Robot1: ROBOT_1;
+              case Octopus1: OCTOPUS_1;
+              case Penguin1: PENGUIN_1;
+              case _: UNIT;
+            }
+        }}></div>
+      </div>;
   }
 
   function render()

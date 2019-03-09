@@ -40,7 +40,7 @@ class Unit implements Model {
     return switch terrain {
       case TVoid: false;
       case TLava: canFly || canSwim;
-      case TMountain: canFly;
+      case TMountain | TRock: canFly;
       case TLand: true;
     }
 

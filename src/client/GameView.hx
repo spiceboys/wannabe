@@ -6,11 +6,11 @@ class GameView extends View {
   
   @:attribute var game:GameSession;
   @:computed var availableTiles:Map<Tile, Bool> = switch game.nextUnit {
-    case None: new Map();
-    case Some(_):
+    case Some(u) if (u.owner.id == game.self.id):
       [for (info in game.availableMoves)
         game.getTile(info.x, info.y) => info.available
       ];
+    default: new Map();
   }
 
   static var GRID = css({

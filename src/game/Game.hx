@@ -13,7 +13,7 @@ class GameOf<TPlayer:Player> implements Model {
   @:computed var height:Int = Math.ceil(tiles.length / width);
 
   @:observable var running:Bool = false;
-  @:constant var service:PlayerId->Action->Promise<Array<Reaction>> = runLocally;
+  @:constant var service:PlayerId->Action->Promise<Array<Reaction>> = @byDefault runLocally;
 
   @:observable private var tiles:Slice<Tile> = @byDefault [];
   @:observable var players:List<TPlayer> = @byDefault null;

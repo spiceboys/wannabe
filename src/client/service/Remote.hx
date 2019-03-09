@@ -19,7 +19,14 @@ class Remote {
 				received.nextTime().next(
 					msg -> switch msg {
 						case RoomChanged(players):
-							var game = new Game({ id: id, players: players });
+							var game = new Game({ 
+								id: id, 
+								players: players, 
+								service: (_, action) -> {
+									send(GameAction(action));
+									[];
+								}
+							});
 							received.handle(function (msg) @:privateAccess switch msg {
 								case RoomChanged(players):
 									game.updatePlayers(players);

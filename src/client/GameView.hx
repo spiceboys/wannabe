@@ -20,6 +20,16 @@ class GameView extends View {
     default: new Map();
   }
 
+  static var PLAYER_COLORS = [
+    '#FF00FF',
+    '#FFFF00',
+    '#00FF00',
+    '#00FFFF',
+  ];
+
+  function getPlayerColor(p:Player)
+    return PLAYER_COLORS[Lambda.indexOf(game.players, p)];
+
   static var ROOT = css({
     position: 'relative',
   });
@@ -40,6 +50,19 @@ class GameView extends View {
     }
   });
 
+  static var SCORE = css({
+    position: 'fixed',
+    top: '20px',
+    left: '20px',
+    right: '20px',
+    pointerEvents: 'none',
+    display: 'flex',
+    padding: '20px',
+    justifyContent: 'space-around',
+    background: 'rgba(0, 0, 0, .25)',
+    color: 'white',
+  });
+
   static var NOTIFICATIONS = css({
     position: 'fixed',
     bottom: '10px',
@@ -58,27 +81,38 @@ class GameView extends View {
       {for (u in game.units)
         <UnitView unit={u} />
       }
-      <div class={ACTIONS}>
-        {
-          if (game.isMyTurn)
-            <button onclick={game.skip()}>{
-              switch game.nextUnit {
-                case Some({ moved: false }): 'Skip Move';
-                default: 'Skip Attack';
-              }
-            }</button>
-        }
-      </div>
-      <div class={NOTIFICATIONS}>
-        {
-          switch [game.players.count(p -> p.jewels != 0), game.self.jewels] {
-            case [1, 0]: "Game Over";
-            case [1, _]: "You are the fucking king";
-            case [_, 0]: "You Lose!";
-            case _: "";
+      <Isolated>
+        <div class={SCORE}>
+          {for (p in game.players)
+            <div style={{ color: getPlayerColor(p) }}>{p.name}: {p.jewels}</div>
           }
-        }
-      </div>
+        </div>
+      </Isolated>
+      <Isolated>
+        <div class={ACTIONS}>
+          {
+            if (game.isMyTurn)
+              <button onclick={game.skip()}>{
+                switch game.nextUnit {
+                  case Some({ moved: false }): 'Skip Move';
+                  default: 'Skip Attack';
+                }
+              }</button>
+          }
+        </div>
+      </Isolated>
+      <Isolated>
+        <div class={NOTIFICATIONS}>
+          {
+            switch [game.players.count(p -> p.jewels != 0), game.self.jewels] {
+              case [1, 0]: "Game Over";
+              case [1, _]: "You are the fucking king";
+              case [_, 0]: "You Lose!";
+              case _: "";
+            }
+          }
+        </div>
+      </Isolated>
     </div>
   ;
 }

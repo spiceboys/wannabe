@@ -8,8 +8,25 @@ class TileView extends View {
   @:attribute var game:GameSession;
   @:attribute var availableTiles:tink.pure.Mapping<Tile, Bool>;
   function render() {
-    var t = game.getTile(x, y);
     
+    var t = game.getTile(x, y);
+
+    function handleClick() {
+      if (availableTiles[t]) 
+        switch game.nextUnit {
+          case Some({ moved: false }): 
+            game.moveTo(x, y).handle(function (o) switch o {
+              case Success(_):
+                haxe.Timer.delay(function () {
+                  if (Lambda.count(availableTiles) == 0) game.skip();
+                }, 100);
+              default:
+            });
+          default: 
+            game.attack(x, y);
+        }    
+    }
+
     return 
       <div 
         class={
@@ -30,13 +47,7 @@ class TileView extends View {
             case TVoid: VOID;
           }
         }
-        onclick={
-          if (availableTiles[t]) 
-            switch game.nextUnit {
-              case Some({ moved: false }): game.moveTo(x, y);
-              default: game.attack(x, y);
-            }
-        }
+        onclick={handleClick}
       >
         {
           if (availableTiles.exists(t))
@@ -46,7 +57,6 @@ class TileView extends View {
         }
       </div>;
   }  
-
 
   static var TILE = css({
     width: '90px',

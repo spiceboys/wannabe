@@ -12,28 +12,68 @@ class LobbyView extends View {
     color: 'green',
   });
 
+  static var H1 = css({
+    color: "#f1f1f1",
+    fontSize: "70px"
+  });
+
   static var PAGE = css({
-    fontSize: '50px'
+    fontSize: '50px',
+    backgroundColor: "#92c16f",
+    height: "100vh",
+    textAlign: "center",
+    padding: "50px",
+    color: "#f1f1f1"
+  });
+
+  static var PLAYER = css({
+    margin: "50px"
+  });
+  
+  static var IMG = css({
+    height: "300px"
+  });
+
+  static var LIST = css({
+    display: 'flex',
+    justifyContent: "space-evenly",
+    listStyle: "none"
+  });
+
+  static var BTN = css({
+    fontSize: "50px",
+    width: "300px",
+    height: "80px",
+    backgroundColor: "#86e923",
+    borderStyle: "none",
+    borderBottom: "10px solid #60bc03",
+    color: "#f1f1f1",
+    cursor: "pointer"
   });
 
   function toggleReady()
     setReady(!self.ready);
 
-  function renderReady(ready:Bool, onclick)
+  function renderReady(ready:Bool, onclick) {
+    var txt = (ready) ? "READY" : "NOT READY";
+    
     return <div onclick={onclick}>
-      <if {ready}>
-        Ready
+      <if {onclick != null}>
+        <button class={BTN}>{txt}</button>
       <else>
-        Not Ready
+        {txt}
       </if>
     </div>
   ;
+  }
 
   function renderPlayer(p:Player, index:Int)
     return <li class={[SELF => p.id == self.id]}>
       <if {p.house != null}>
         <div>{p.name}</div>
-        <div>{Std.string(p.house)}</div>
+        <div>
+          <img class={[IMG]} src={"./assets/lobby_" + Std.string(p.house).toLowerCase().substring(1) + ".png"} />
+        </div>
         {renderReady(p.ready, if (p.id == self.id) toggleReady else null)}
       <else>
         <div><i>Undecided</i></div>
@@ -45,8 +85,9 @@ class LobbyView extends View {
 
   function render() {
     var players = players.toArray();
-    return <div class={["foo", PAGE]}>
-      <ul>
+    return <div class={[PAGE]}>
+      <h1>GET READY!</h1>
+      <ul class={LIST}>
         {for (i in 0...players.length) renderPlayer(players[i], i)}
       </ul>
     </div>;

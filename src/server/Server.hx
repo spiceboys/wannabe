@@ -3,7 +3,7 @@ package server;
 import haxe.Json;
 import haxe.ds.Map;
 import js.npm.ws.WebSocket;
-import server.Root;
+import game.Protocol;
 
 class Server {
   static public final BUILD_DATE = server.util.Macro.getBuildDate();
@@ -27,18 +27,13 @@ class Server {
       if (rooms.exists(id)) rooms[id];
       else {
         trace('[room-$id] Room created');
-        final routes = new Map<String, RouteHandler>();
-        final players = new State(List.fromArray([]));
-        final room:Room = {
+        final room = new game.Game.GameOf<Player>({
           id: id,
-          isRunning: false,
-          routes: routes,
-          players: players,
-          root: new Root({
-            route: (route, handler) -> routes[route] = handler,
-            players: players.observe()
-          })
-        };
+          width: 20,
+          tiles: [],//TODO: fill
+          units: [],
+          players: []
+        });
         rooms[id] = room;
       }
 
@@ -46,69 +41,77 @@ class Server {
     final wss = new js.npm.ws.Server({port: port});
     wss.on("connection", (ws:WebSocket) -> {
       trace("WebSocket connected");
+
       var room:Room = null;
       var player:Player = null;
 
-      function call(route:String, ?data:Dynamic = null)
-        ws.send(Json.stringify({call: route, data: data}), _ -> {});
-      
-      function respond(route:String, ?data:Dynamic = null)
-        call('${route}Response', data);
-      
+      function respond(r:ServerMessage)
+        ws.send(Json.stringify(r), _ -> {});
+
       function disconnect(terminate:Bool = false) {
         if (player != null) {
           trace('[room-${room.id}] Player left: ${player.id}');
-          room.players.set(room.players.value.filter(p -> p.id != player.id));
-          room.routes["leave"](player, null);
-          if (room.players.value.length == 0) rooms.remove(room.id);
+          room.disconnectPlayer(player);
+          if (room.players.length == 0) rooms.remove(room.id);
           room = null;
           player = null;
         }
         if (terminate) ws.terminate();
+      }    
+
+      function report<T>(p:Promise<T>):Future<T>
+        return p.recover(function (e) {
+          respond(Panic(e.message));
+          return cast Future.NEVER;
+        }).eager();      
+
+      function roomChanged() {
+        for (p in room.players)
+          p.send(RoomChanged(room.players.toArray()));
       }
       
-      ws.on("message", json -> {
-        final msg = Json.parse(json), route = msg.call;
-
-        if (route == "join") {
-          room = getRoom(msg.data.roomId);
-          if (room.isRunning)
-            return respond(route, Failure(new Error("Cannot join an already running game")));
-          final playerId = msg.data.playerId;
-          if (room.players.value.exists(p -> p.id == playerId))
-            return respond(route, Failure(new Error('Player already connected: $playerId')));
-          
-          player = {
-            id: playerId,
-            connection: {
-              call: call,
-              disconnect: () -> disconnect(true)
-            }
-          };
-          room.players.set(room.players.value.prepend(player));
-          trace('[room-${room.id}] Player joined: ${player.id}');
+      ws.on("message", function (json) {
+        final msg:ClientMessage = Json.parse(json);
+        if (room == null)
+          switch msg {
+            case JoinRoom(id, init):
+              room = getRoom(id);
+              player = tink.Anon.merge(init, ready = false, disconnect = disconnect.bind(true), send = respond);
+              report(room.addPlayer(player)).handle(roomChanged);
+            default: 
+              respond(Panic('must join room before any other action'));
+              disconnect(true);
+          }
+        else switch msg {
+          case JoinRoom(_):
+            respond(Panic('already joined a room'));
+          case SetReady(ready):
+            player = tink.Anon.merge(player, ready = ready);
+            report(room.changePlayer(player)).handle(function () {
+              roomChanged();
+              if (room.players.count(p -> p.ready) == room.players.length && room.players.length > 1) {
+                GameStarted(room.startGame());
+              }
+            });
+          case Forfeit:
+            disconnect(true);
+            roomChanged();
+          case GameAction(action):
+            report(room.dispatch(player.id, action))
+              .handle(function (reactions) {
+                for (p in room.players)
+                  p.send(GameReaction(reactions));
+              });
         }
-
-        if (!room.routes.exists(route))
-          return respond(route, Failure(new Error('Not implemented')));
-        
-        final res = room.routes[route](player, msg.data);
-        if (res != null)
-          res.handle(data -> respond(route, data));
-      });
-
-      ws.on("close", (code, reason) -> {
-        trace('WebSocket disconnected: code=${code} reason=${reason}');
-        disconnect();
       });
     });
   }
 }
 
-typedef Room = {
-  final id:String;
-  final isRunning:Bool;
-  final routes:Map<String, RouteHandler>;
-  final players:State<List<Player>>;
-  final root:Root;
+typedef Room = game.Game.GameOf<Player>;
+
+typedef Player = game.Player & {
+  final ready:Bool;
+  function send(msg:game.Protocol.ServerMessage):Void;
+  function disconnect():Void;
 }

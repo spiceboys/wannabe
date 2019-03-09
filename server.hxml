@@ -1,8 +1,9 @@
 -lib tink_core
 -lib tink_state
--lib tink_pure
+-lib coconut.data
 -lib hxnodejs
 -lib hxnodejs-ws
 -js bin/server.js
 -cp src
+-D server
 -main server.Server

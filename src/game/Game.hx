@@ -155,13 +155,20 @@ class GameOf<TPlayer:Player> implements Model {
       if (u.id == id) return Some(u);
     return None;
   }
+  static final console = 
+    #if nodejs 
+       js.Node.console;
+    #else
+      js.Browser.console;
+    #end
 
   function apply(reactions:Array<Reaction>) {
     
     for (r in reactions) switch r {
       case UnitUpdate(id, to):
         switch unitById(id) {
-          case None: 
+          case None:
+            console.error('unit not found $id');
           case Some(u):
             @:privateAccess u.update(to);
         }

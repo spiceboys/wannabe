@@ -78,11 +78,13 @@ class GameView extends View {
   }));
 
   static var AVAILABLE = css({
-    outline: '2px solid lime'
+    outline: '2px solid lime',
+    cursor: 'pointer'
   });
 
   static var UNAVAILABLE = css({
-    outline: '2px solid red'
+    outline: '2px solid red',
+    cursor: 'not-allowed'
   });
 
   function showAvailability(t:Tile):ClassName
@@ -121,7 +123,7 @@ class GameView extends View {
           if (availableTiles[t]) 
             switch game.nextUnit {
               case Some({ moved: false }): game.moveTo(x, y);
-              default:
+              default: game.attack(x, y);
             }
         }
       >

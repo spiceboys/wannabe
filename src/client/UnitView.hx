@@ -42,6 +42,7 @@ class UnitView extends View {
 
   static var UNIT = css({
     position: 'absolute',
+    pointerEvents: 'none',
     left: '0px',
     transition: 'all .35s',
   });

@@ -9,6 +9,12 @@ typedef Game = GameOf<Player>;
 
 class GameOf<TPlayer:Player> implements Model {
   
+  @:skipCheck var initialCoords:Array<Array<{x:Int, y:Int}>> = [
+    [{x:4, y:3}, {x:3, y:5}, {x:4, y:6}], 
+    [{x:16, y:16}, {x:14, y:15}, {x:15, y:17}], 
+    [{x:4, y:16}, {x:6, y:15}, {x:3, y:14}],
+    [{x:16, y:4}, {x:15, y:6}, {x:14, y:3}]
+  ];
   @:skipCheck var obstacles:Array<Array<Int>> = [[10,11],[],[],[],[],[],[10],[9,10,11,12,19],[2,12,13,18,19,20],[1,2,3,4,13,19,20],[3,13,14,20],[7,8,14],[8,9,13,14],[9,12,13],[10,11,12],[10],[],[],[],[]];
   @:constant var id:String;
   @:observable var width:Int = @byDefault 0;
@@ -105,7 +111,9 @@ class GameOf<TPlayer:Player> implements Model {
   function getChosenUnits(players:Array<TPlayer>)
     return [for (p in players) for (u in getHouseUnits(p)) u];
 
-  function getHouseUnits(player:Player)
+  function getHouseUnits(player:TPlayer) {
+    var coords = initialCoords.pop();
+    
     return switch player.house {
       case HOctopus: [
         new Unit({
@@ -113,17 +121,17 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Octopus1,
           status: {
-            range: 2,
+            range: 4,
             moved: false,
             delay: 0,
             hitpoints: 15,
             maxHitpoints: 15,
-            x: 10,
-            y: 5,
+            x: coords[0].x,
+            y: coords[0].y,
             frequency: 1,
             canFly: false,
             canSwim: false,
-            speed: 3,
+            speed: 6,
           }
         }),
         new Unit({
@@ -131,17 +139,17 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Octopus2,
           status: {
-            range: 1,
+            range: 2,
             moved: false,
             delay: 0,
             hitpoints: 15,
             maxHitpoints: 15,
-            x: 10,
-            y: 5,
+            x: coords[1].x,
+            y: coords[1].y,
             frequency: 1,
             canFly: false,
             canSwim: false,
-            speed: 2,
+            speed: 4,
           }
         }),
         new Unit({
@@ -149,17 +157,17 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Octopus3,
           status: {
-            range: 3,
+            range: 6,
             moved: false,
             delay: 0,
             hitpoints: 15,
             maxHitpoints: 15,
-            x: 10,
-            y: 5,
+            x: coords[2].x,
+            y: coords[2].y,
             frequency: 1,
             canFly: false,
             canSwim: false,
-            speed: 2,
+            speed: 4,
           }
         }),
       ];
@@ -174,8 +182,8 @@ class GameOf<TPlayer:Player> implements Model {
             delay: 0,
             hitpoints: 10,
             maxHitpoints: 10,
-            x: 10,
-            y: 5,
+            x: coords[0].x,
+            y: coords[0].y,
             frequency: 1,
             canFly: false,
             canSwim: false,
@@ -187,17 +195,17 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Robot2,
           status: {
-            range: 2,
+            range: 4,
             moved: false,
             delay: 0,
             hitpoints: 12,
             maxHitpoints: 12,
-            x: 10,
-            y: 5,
+            x: coords[1].x,
+            y: coords[1].y,
             frequency: 1,
             canFly: false,
             canSwim: false,
-            speed: 3,
+            speed: 6,
           }
         }),
         new Unit({
@@ -205,17 +213,17 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Robot3,
           status: {
-            range: 4,
+            range: 8,
             moved: false,
             delay: 0,
             hitpoints: 11,
             maxHitpoints: 11,
-            x: 10,
-            y: 5,
+            x: coords[2].x,
+            y: coords[2].y,
             frequency: 1,
             canFly: false,
             canSwim: false,
-            speed: 2,
+            speed: 4,
           }
         }),
       ];
@@ -225,13 +233,31 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Penguin1,
           status: {
-            range: 1,
+            range: 2,
             moved: false,
             delay: 0,
             hitpoints: 14,
             maxHitpoints: 14,
-            x: 10,
-            y: 5,
+            x: coords[0].x,
+            y: coords[0].y,
+            frequency: 1,
+            canFly: false,
+            canSwim: false,
+            speed: 8,
+          }
+        }),
+        new Unit({
+          owner: player,
+          id: new UnitId(),
+          kind: Penguin2,
+          status: {
+            range: 8,
+            moved: false,
+            delay: 0,
+            hitpoints: 11,
+            maxHitpoints: 11,
+            x: coords[1].x,
+            y: coords[1].y,
             frequency: 1,
             canFly: false,
             canSwim: false,
@@ -241,41 +267,24 @@ class GameOf<TPlayer:Player> implements Model {
         new Unit({
           owner: player,
           id: new UnitId(),
-          kind: Penguin2,
-          status: {
-            range: 5,
-            moved: false,
-            delay: 0,
-            hitpoints: 11,
-            maxHitpoints: 11,
-            x: 10,
-            y: 5,
-            frequency: 1,
-            canFly: false,
-            canSwim: false,
-            speed: 2,
-          }
-        }),
-        new Unit({
-          owner: player,
-          id: new UnitId(),
           kind: Penguin3,
           status: {
-            range: 3,
+            range: 6,
             moved: false,
             delay: 0,
             hitpoints: 12,
             maxHitpoints: 12,
-            x: 10,
-            y: 5,
+            x: coords[2].x,
+            y: coords[2].y,
             frequency: 1,
             canFly: false,
             canSwim: false,
-            speed: 3,
+            speed: 6,
           }
         }),
       ];
     }
+  }
 
   public function startGame():GameInit {
     _startGame();

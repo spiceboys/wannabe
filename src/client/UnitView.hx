@@ -6,19 +6,28 @@ using StringTools;
 
 class UnitView extends View {
   @:attribute var unit:Unit;
+  @:attribute var isCurrent:Bool;
   @:attribute var color:String;
+
   function getClass()
-    return switch unit.kind {
-      case Robot1: ROBOT_1;
-      case Robot2: ROBOT_2;
-      case Robot3: ROBOT_3;
-      case Octopus1: OCTOPUS_1;
-      case Octopus2: OCTOPUS_2;
-      case Octopus3: OCTOPUS_3;
-      case Penguin1: PENGUIN_1;
-      case Penguin2: PENGUIN_2;
-      case Penguin3: PENGUIN_3;
-    }
+    return 
+      (switch unit.kind {
+        case Robot1: ROBOT_1;
+        case Robot2: ROBOT_2;
+        case Robot3: ROBOT_3;
+        case Octopus1: OCTOPUS_1;
+        case Octopus2: OCTOPUS_2;
+        case Octopus3: OCTOPUS_3;
+        case Penguin1: PENGUIN_1;
+        case Penguin2: PENGUIN_2;
+        case Penguin3: PENGUIN_3;
+      }).add([CURRENT => isCurrent]);
+
+  static final CURRENT = css({
+    animation: '.5s active-unit',
+    animationDirection: 'alternate-reverse',
+    animationIterationCount: 'infinite',
+  });
 
   @:computed var transform:String = 'translate(${unit.x * 90}px, ${unit.y * 60}px)';
 
@@ -110,4 +119,18 @@ class UnitView extends View {
     height: '108px',
     top: '-48px',
   }));    
+
+  var wasCurrent = false;
+  function viewDidMount()
+    showIfNeeded();
+
+  function viewDidUpdate()
+    showIfNeeded();
+
+  function showIfNeeded() {
+    var isCurrent = tink.state.Observable.untracked(() -> this.isCurrent);
+    if (isCurrent && !wasCurrent)
+      (cast Renderer.getNative(this):js.html.Element).scrollIntoView(cast { smooth: true });
+  }
+
 }

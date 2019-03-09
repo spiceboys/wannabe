@@ -85,7 +85,15 @@ class GameView extends View {
         }
       </ul>
       {for (u in game.units)
-        <UnitView unit={u} key={u} color={getPlayerColor(u.owner.id)} />
+        <UnitView 
+          unit={u} 
+          isCurrent={switch game.nextUnit {
+            case Some(cur): cur == u;
+            default: false;
+          }} 
+          key={u} 
+          color={getPlayerColor(u.owner.id)} 
+        />
       }
       <Isolated>
         <div class={SCORE}>

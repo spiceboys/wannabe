@@ -21,10 +21,10 @@ class GameView extends View {
   }
 
   static var PLAYER_COLORS = [
-    '#FF00FF',
-    '#FFFF00',
-    '#00FF00',
-    '#00FFFF',
+    '#fcbe1c', 
+    '#59e334',
+    '#f91ffc',
+    '#dffc18',
   ];
 
   function getPlayerColor(p:Player)
@@ -59,7 +59,7 @@ class GameView extends View {
     display: 'flex',
     padding: '20px',
     justifyContent: 'space-around',
-    background: 'rgba(0, 0, 0, .25)',
+    background: 'rgba(0, 0, 0, .45)',
     color: 'white',
   });
 

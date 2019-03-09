@@ -9,7 +9,7 @@ class Server {
   static public final BUILD_DATE = server.util.Macro.getBuildDate();
   static public final HASH = server.util.Macro.getGitSha().substr(0, 8);
 
-  static final DEFAULT_PORT = 2751;
+  static final DEFAULT_PORT = 50000;
 
   static function main() {
     process.chdir(__dirname);

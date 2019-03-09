@@ -20,7 +20,7 @@ class Client {
     });
 
     final remote = client.service.Remote.connect(
-      "ws://localhost:2751", 
+      'ws://${window.location.hostname}:50000', 
       self.value, 
       window.location.hash.substr(1)
     ).handle(function (o) switch o {

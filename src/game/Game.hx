@@ -21,6 +21,12 @@ class GameOf<TPlayer:Player> implements Model {
   @:observable var players:List<TPlayer> = @byDefault null;
   @:observable var units:List<Unit> = @byDefault null;
 
+  @:computed var survivingPlayers:List<TPlayer> = 
+    players.filter(p -> units.exists(u -> u.owner.id == p.id));
+  
+  @:computed var winner:Option<TPlayer> =
+    if (survivingPlayers.length == 1) survivingPlayers.first() else None;
+
   public function canAttack(attacker:Unit, target:Unit, withObstacles = false) {
     var retVal = attacker != target && attacker.owner != target.owner && 
       Math.pow(attacker.y - target.y, 2) + Math.pow(attacker.x - target.x, 2) <= Math.pow(attacker.status.range, 2) * 2;

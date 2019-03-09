@@ -24,21 +24,32 @@ class StartView extends View {
     transform: "scale(1.2, 1.2)"
   });
 
-  static var ROBOT = css({
+  static var OPTION = css({
+    transition: 'all .25s',
+    cursor: 'pointer',
+    '&:hover': {
+      filter: 'brightness(1.1)',
+    }
+  });
+
+  static var ROBOT = OPTION.add(css({
     color: 'red',
-  });
+  }));
 
-  static var OCTOPUS = css({
+  static var OCTOPUS = OPTION.add(css({
     color: 'purple',
-  });
+  }));
 
-  static var PENGUIN = css({
+  static var PENGUIN = OPTION.add(css({
     color: 'blue',
-  });
+  }));
 
   static var INPUT = css({
     marginTop: "40px",
-    fontSize: "35px"
+    fontFamily: 'inherit',
+    fontSize: "35px",
+    padding: '.5em .5em .25em',
+    textAlign: 'center',
   });
 
   static var H1 = css({
@@ -56,7 +67,8 @@ class StartView extends View {
   static var UL = css({
     display: "flex",
     justifyContent: "space-evenly",
-    marginTop: "80px"
+    marginTop: "80px",
+    listStyle: 'none',
   });
   
   static var DESC = css({

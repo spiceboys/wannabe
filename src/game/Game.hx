@@ -19,9 +19,14 @@ class GameOf<TPlayer:Player> implements Model {
   @:observable var players:List<TPlayer> = @byDefault null;
   @:observable var units:List<Unit> = @byDefault null;
 
-  public function canAttack(attacker:Unit, target:Unit)
-    return attacker != target && attacker.owner != target.owner && 
+  public function canAttack(attacker:Unit, target:Unit, withObstacles = false) {
+    var retVal = attacker != target && attacker.owner != target.owner && 
       Math.pow(attacker.y - target.y, 2) + Math.pow(attacker.x - target.x, 2) <= Math.pow(attacker.status.range, 2) * 2;
+
+    if (retVal && withObstacles) {}
+
+    return retVal;
+  }
 
   public function computeDamage(attacker:Unit, target:Unit)
     return 1;
@@ -80,7 +85,11 @@ class GameOf<TPlayer:Player> implements Model {
         new Unit({
           owner: players[0],
           id: new UnitId(),
-          kind: Penguin1,
+          kind: switch players[0].house {
+            case HRobot: Robot1;
+            case HPenguin: Penguin1;
+            case HOctopus: Octopus1;
+          },
           status: {
             range: 1,
             moved: false,
@@ -98,7 +107,11 @@ class GameOf<TPlayer:Player> implements Model {
         new Unit({
           owner: players[1],
           id: new UnitId(),
-          kind: Octopus1,
+          kind: switch players[1].house {
+            case HRobot: Robot1;
+            case HPenguin: Penguin1;
+            case HOctopus: Octopus1;
+          },
           status: {
             moved: false,
             delay: 0,

@@ -388,7 +388,7 @@ class GameOf<TPlayer:Player> implements Model {
         }
       case SpawnGem(u):
         unitKilled(u);
-        spawnGem(u.x, u.y);
+        spawnGem(u.status.x, u.status.y);
         case CollectGem(_, _): throw "Please, implement me before you die";
     }
     return reactions;

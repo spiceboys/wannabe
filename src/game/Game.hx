@@ -26,6 +26,7 @@ class GameOf<TPlayer:Player> implements Model {
   @:observable private var tiles:Slice<Tile> = @byDefault [];
   @:observable var players:List<TPlayer> = @byDefault null;
   @:observable var units:List<Unit> = @byDefault null;
+  @:observable var jewels:List<Jewel> = @byDefault null;
 
   @:computed var survivingPlayers:List<TPlayer> = 
     players.filter(p -> units.exists(u -> u.owner.id == p.id));
@@ -43,7 +44,7 @@ class GameOf<TPlayer:Player> implements Model {
   }
 
   public function computeDamage(attacker:Unit, target:Unit)
-    return 1;
+    return attacker.damage;
 
   @:computed var nextUnit:Option<Unit> = {
 
@@ -132,6 +133,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 6,
+            damage: 3,
           }
         }),
         new Unit({
@@ -150,6 +152,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 4,
+            damage: 3,
           }
         }),
         new Unit({
@@ -157,7 +160,7 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Octopus3,
           status: {
-            range: 6,
+            range: 2,
             moved: false,
             delay: 0,
             hitpoints: 15,
@@ -168,6 +171,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 4,
+            damage: 5,
           }
         }),
       ];
@@ -188,6 +192,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 5,
+            damage: 2,
           }
         }),
         new Unit({
@@ -206,6 +211,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 6,
+            damage: 4,
           }
         }),
         new Unit({
@@ -224,6 +230,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 4,
+            damage: 2,
           }
         }),
       ];
@@ -244,6 +251,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 8,
+            damage: 4,
           }
         }),
         new Unit({
@@ -262,6 +270,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 4,
+            damage: 2,
           }
         }),
         new Unit({
@@ -269,7 +278,7 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Penguin3,
           status: {
-            range: 6,
+            range: 3,
             moved: false,
             delay: 0,
             hitpoints: 12,
@@ -280,6 +289,7 @@ class GameOf<TPlayer:Player> implements Model {
             canFly: false,
             canSwim: false,
             speed: 6,
+            damage: 5,
           }
         }),
       ];
@@ -345,7 +355,7 @@ class GameOf<TPlayer:Player> implements Model {
                   UnitUpdate(u.id, tink.Anon.merge(u.status, moved = false, delay = u.delay + u.frequency)),
                   UnitUpdate(target.id, tink.Anon.merge(target.status, hitpoints = target.hitpoints - computeDamage(u, target))),
                 ].concat(
-                  if (target.hitpoints - computeDamage(u, target) <= 0) [SpawnGem(target)] else []
+                  if (target.hitpoints - computeDamage(u, target) <= 0) [SpawnGem(target.id, target.x, target.y)] else []
                 );
               default:
                 new Error('illegal');
@@ -385,16 +395,21 @@ class GameOf<TPlayer:Player> implements Model {
           case Some(u):
             @:privateAccess u.update(to);
         }
-      case SpawnGem(u):
-        unitKilled(u);
-        case CollectGem(_, _): throw "Please, implement me before you die";
+      case SpawnGem(unitId, x, y):
+        unitKilled(unitId);
+        spawnGem(x, y);
+      case CollectGem(_, _): throw "Please, implement me before you die";
     }
     return reactions;
   }
 
-  @:transition private function unitKilled(u:Unit) {
-    trace("unitKilled", u.id);
-    return {units: units.filter(cu -> cu.id != u.id)};
+  @:transition private function unitKilled(unitId:UnitId) {
+    return {units: units.filter(cu -> cu.id != unitId)};
+  }
+
+  @:transition private function spawnGem(x:Int, y:Int) {
+    var jewelList:Array<JewelKind> = [Red, Blue, Yellow, Purple];
+    return {jewels: jewels.concat([new Jewel({kind: jewelList[Std.random(jewelList.length)], x: x, y: y})])};
   }
 
   public function dispatch(p:PlayerId, action:Action) {

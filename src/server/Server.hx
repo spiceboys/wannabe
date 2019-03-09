@@ -42,12 +42,16 @@ class Server {
       var room:Room = null;
       var player:Player = null;
 
+      function log(msg:String)
+        if (room == null) trace(msg);
+        else trace('[room-${room.id}] [${if (player.name != "") player.name else player.id}] $msg');
+
       function respond(r:ServerMessage)
         ws.send(Json.stringify(r), _ -> {});
 
       function disconnect(terminate:Bool = false) {
         if (player != null) {
-          trace('[room-${room.id}] Player left: ${player.id}');
+          log('Disconnected');
           room.disconnectPlayer(player);
           if (room.players.length == 0) rooms.remove(room.id);
           room = null;
@@ -69,14 +73,14 @@ class Server {
       function roomChanged() {
         broadcast(RoomChanged(room.players.toArray()));
 
-        if (!room.running && room.players.count(p -> p.ready) == room.players.length && room.players.length > 1) {
+        if (!room.running && room.players.length > 1 && room.players.count(p -> p.ready) == room.players.length) {
+          log("Game started");
           broadcast(GameStarted(room.startGame()));
         }
-
       }
       
       ws.on("close", (code, reason) -> {
-        trace('WebSocket disconnected: code=${code} reason=${reason}');
+        log('WebSocket disconnected: code=${code}');
         disconnect();
       });
 
@@ -87,6 +91,7 @@ class Server {
             case JoinRoom(id, init):
               room = getRoom(id);
               player = tink.Anon.merge(init, disconnect = disconnect.bind(true), send = respond);
+              log('Joined');
               report(room.addPlayer(player)).handle(roomChanged);
             default: 
               respond(Panic('must join room before any other action'));
@@ -97,20 +102,23 @@ class Server {
             case JoinRoom(_):
               respond(Panic('already joined a room'));
             case SetPlayerDetails(name, house):
+              log('Selected name="$name" house=$house');
               player = tink.Anon.merge(player, name = name, house = house);
               report(room.changePlayer(player)).handle(roomChanged);
             case SetReady(ready):
+              log(if (ready) "Ready" else "Not ready");
               player = tink.Anon.merge(player, ready = ready);
               report(room.changePlayer(player)).handle(roomChanged);
             case Forfeit:
               disconnect(true);
               roomChanged();
             case GameAction(action):
+              log(Std.string(action));
               report(room.dispatch(player.id, action))
-                .handle(function (reactions) {
+                .handle(function (reactions)
                   for (p in room.players)
-                    p.send(GameReaction(reactions));
-                });
+                    p.send(GameReaction(reactions))
+                );
           }
       });
     });

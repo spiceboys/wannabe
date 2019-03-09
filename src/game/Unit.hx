@@ -12,6 +12,7 @@ typedef UnitStatus = {
   final frequency:Float; 
   final moved:Bool;
   final range:Int;
+  final damage:Int;
 }
 
 enum UnitKind {

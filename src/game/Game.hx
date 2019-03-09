@@ -140,7 +140,10 @@ class GameOf<TPlayer:Player> implements Model {
     return { players: List.fromArray(players) };
   #end
 
-  @:constant @:skipCheck private var pathFinder:pathfinder.Pathfinder = new pathfinder.Pathfinder(this);
+  @:computed @:skipCheck private var pathFinder:Pathfinder = {
+    tiles;
+    new Pathfinder(this);
+  }
 
   @:computed var availableMoves:List<TileInfo> = switch nextUnit {
     case None: null;

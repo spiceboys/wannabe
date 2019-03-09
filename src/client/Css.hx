@@ -26,13 +26,6 @@ class Css {
         if (key != 'children') 
           Reflect.setField(dummy.style, key, value);
 
-      var content = switch src['content'] {
-        case null: '';
-        case v: 'content: "$v";';
-      }
-
-      trace('$name { ${dummy.style.cssText} $content }');
-
       sheet.insertRule('$name { ${dummy.style.cssText} }', sheet.cssRules.length);
       
       switch s.children {

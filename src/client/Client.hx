@@ -2,11 +2,11 @@ package client;
 
 class Client {
   static function main() {
-    var players = [
-      new Player({ name: 'Gene', color: 0xFFFF00 }),
-      new Player({ name: 'Hector', color: 0x000000 }),
-      new Player({ name: 'Arsen', color: 0x0000FF }),
-      new Player({ name: 'Juraj', color: 0x00FFFF }),
+    var players:Array<Player> = [
+      { id: new PlayerId(), name: 'Gene', color: 0xFFFF00 },
+      { id: new PlayerId(), name: 'Hector', color: 0x000000 },
+      { id: new PlayerId(), name: 'Arsen', color: 0x0000FF },
+      { id: new PlayerId(), name: 'Juraj', color: 0x00FFFF },
     ];
 
     var size = 20;
@@ -56,7 +56,7 @@ class Client {
     Renderer.mount(
       document.body,
       coconut.Ui.hxx(
-        <GameView game={game} />
+        <LobbyView players={players} self={players[0].id} />
       )
     );
     

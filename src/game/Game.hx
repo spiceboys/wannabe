@@ -21,7 +21,7 @@ class GameOf<TPlayer:Player> implements Model {
 
   public function canAttack(attacker:Unit, target:Unit)
     return attacker != target && attacker.owner != target.owner && 
-      Math.sqrt(Math.pow(attacker.y - target.y, 2) + Math.pow(attacker.x - target.x, 2)) <= Math.sqrt(Math.pow(attacker.status.range, 2) * 2);
+      Math.pow(attacker.y - target.y, 2) + Math.pow(attacker.x - target.x, 2) <= Math.pow(attacker.status.range, 2) * 2;
 
   public function computeDamage(attacker:Unit, target:Unit)
     return 1;
@@ -140,7 +140,7 @@ class GameOf<TPlayer:Player> implements Model {
     return { players: List.fromArray(players) };
   #end
 
-  @:computed @:skipCheck private var pathFinder:pathfinder.Pathfinder = new pathfinder.Pathfinder(this);
+  @:constant @:skipCheck private var pathFinder:pathfinder.Pathfinder = new pathfinder.Pathfinder(this);
 
   @:computed var availableMoves:List<TileInfo> = switch nextUnit {
     case None: null;

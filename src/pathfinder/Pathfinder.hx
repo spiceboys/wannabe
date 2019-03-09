@@ -138,7 +138,7 @@ class Pathfinder
 	 * @return	An array of coordinates from start to destination, or null if no path was found within the time limit
 	 */
 	public function createPath( p_start:Coordinate, p_dest:Coordinate, isWalkable:(p_x:Int, p_y:Int )->Bool, ?p_heuristic:EHeuristic, p_isDiagonalEnabled:Bool = true, p_isMapDynamic:Bool = false, p_maxSearchDistance:Int = 0 ):Array<Coordinate>
-	{
+	try {
 		if ( p_heuristic == null )
 		{
 			p_heuristic = EHeuristic.PRODUCT;
@@ -162,6 +162,9 @@ class Pathfinder
 		_startNode.f = _getCost( _startNode, _destNode, p_heuristic );
 		_openList.push( _startNode );
 		return _searchPath( p_heuristic, isWalkable, p_isDiagonalEnabled, p_isMapDynamic, p_maxSearchDistance );
+	}
+	catch (e:Dynamic) {
+		return null;
 	}
 
 	private inline function _getPath():Array<Coordinate>

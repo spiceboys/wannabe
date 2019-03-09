@@ -5,8 +5,10 @@ import client.Css.make in css;
 class GameView extends View {
   
   @:attribute var game:GameSession;
+  @:computed var busy:Bool = game.isInTransition;
+
   @:computed var availableTiles:Map<Tile, Bool> = switch game.nextUnit {
-    case Some(u) if (u.owner.id == game.self.id):
+    case Some(u) if (u.owner.id == game.self.id && !busy && !u.moved):
       [for (info in game.availableMoves)
         game.getTile(info.x, info.y) => info.available
       ];
@@ -16,7 +18,7 @@ class GameView extends View {
   static var ROOT = css({
     position: 'relative',
   });
-  
+
   static var GRID = css({
     listStyle: 'none',
     '& > *': {
@@ -110,6 +112,15 @@ class GameView extends View {
       </div>;
   }
 
+  static var ACTIONS = css({
+    position: 'fixed',
+    bottom: '10px',
+    right: '10px',
+    button: {
+      padding: '1em'
+    }
+  });
+
   function render()
     return <div class={ROOT}>
       <ul class={GRID}>
@@ -122,6 +133,17 @@ class GameView extends View {
       {for (u in game.units)
         <UnitView unit={u} />
       }
+      <div class={ACTIONS}>
+        {
+          if (game.isMyTurn)
+            <button onclick={game.skip()}>{
+              switch game.nextUnit {
+                case Some({ moved: false }): 'Skip Move';
+                default: 'Skip Attack';
+              }
+            }</button>
+        }
+      </div>
     </div>
   ;
 }

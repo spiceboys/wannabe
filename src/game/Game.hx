@@ -74,6 +74,7 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Penguin1,
           status: {
+            moved: false,
             delay: 0,
             hitpoints: 100,
             x: 10,
@@ -89,6 +90,7 @@ class GameOf<TPlayer:Player> implements Model {
           id: new UnitId(),
           kind: Octopus1,
           status: {
+            moved: false,
             delay: 0,
             hitpoints: 100,
             x: 10,
@@ -137,17 +139,26 @@ class GameOf<TPlayer:Player> implements Model {
     return switch action {
       case Move(x, y):
         switch nextUnit {
-          case Some(u) if (u.owner.id == player): 
+          case Some(u) if (u.owner.id == player && !u.moved): 
             var ret:Promise<Array<Reaction>> = new Error('illegal');
             for (target in availableMoves)
               if (target.x == x && target.y == y) {
                 if (target.available)
-                  ret = [UnitUpdate(u.id, tink.Anon.merge(u.status, x = x, y = y, delay = u.delay + u.frequency))];
+                  ret = [UnitUpdate(u.id, tink.Anon.merge(u.status, x = x, y = y, moved = true))];
                 break;
-              }          
+              }
             ret;
           default: new Error('illegal move');
         }
+      case Skip:
+        switch nextUnit {
+          case Some(u) if (u.owner.id == player): 
+            if (u.moved)
+              [UnitUpdate(u.id, tink.Anon.merge(u.status, moved = false, delay = u.delay + u.frequency / 2))];            
+            else
+              [UnitUpdate(u.id, tink.Anon.merge(u.status, moved = true))];
+          default: new Error('illegal move');
+        }      
     }
 
   function unitById(id) {
@@ -187,6 +198,9 @@ class GameOf<TPlayer:Player> implements Model {
 
   @:transition function moveTo(x:Int, y:Int, by:TPlayer) 
     return dispatch(by.id, Move(x, y)).next(_ -> @patch {});
+
+  @:transition function skip(by:TPlayer) 
+    return dispatch(by.id, Skip).next(_ -> @patch {});
 
   public function getUnit(x:Int, y:Int)
     return units.first(u -> u.alive && u.x == x && u.y == y);

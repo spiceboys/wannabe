@@ -8,7 +8,8 @@ typedef UnitStatus = {
   final canFly:Bool;
   final canSwim:Bool;
   final speed:Int;  
-  final frequency:Float;  
+  final frequency:Float; 
+  final moved:Bool;
 }
 
 enum UnitKind {

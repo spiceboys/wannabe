@@ -58,11 +58,13 @@ class GameOf<TPlayer:Player> implements Model {
   }
 
   @:transition function _startGame() {
-    var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand, TileKind.TLava];
+    var tiles = [TileKind.TLand, TileKind.TLand, TileKind.TLand, TileKind.TLava],
+        size = 20;
     return @patch { 
+      width: size,
       running: true,
       tiles: [
-        for (s in 0...width * width)
+        for (s in 0...size * size)
           new Tile({ kind: tiles[Std.random(tiles.length)]})
       ],
     }

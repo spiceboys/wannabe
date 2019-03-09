@@ -9,21 +9,28 @@ class Client {
         window.location.hash = new PlayerId();
       default:
     }
+    var self:Player = {
+      id: new PlayerId(),
+      name: new PlayerId(),
+      color: 0,
+      ready: true,
+    };
     client.service.Remote.connect(
       "ws://localhost:2751", 
-      {
-        id: new PlayerId(),
-        name: new PlayerId(),
-        color: 0,
-        ready: true,
-      }, 
+      self, 
       window.location.hash.substr(1)
     ).handle(function (o) switch o {
       case Success(game):
+        var game = new GameSession({ game: game, self: self });
         Renderer.mount(
           document.body,
           coconut.Ui.hxx(
-            <Isolated>${Std.string(game.running)}</Isolated>
+            <Isolated>
+              {
+                if (game.running) <GameView game={game} />
+                else <p>Waiting for another player ...</p>
+              }
+            </Isolated>
           )
         );        
       case Failure(e): alert(e.message);

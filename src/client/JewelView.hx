@@ -24,7 +24,6 @@ class JewelView extends View {
     position: 'absolute',
     pointerEvents: 'none',
     left: '0px',
-    transition: 'all .35s',
   });
 
   static var RED = JEWEL.add(css({

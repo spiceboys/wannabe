@@ -355,7 +355,7 @@ class GameOf<TPlayer:Player> implements Model {
                   UnitUpdate(u.id, tink.Anon.merge(u.status, moved = false, delay = u.delay + u.frequency)),
                   UnitUpdate(target.id, tink.Anon.merge(target.status, hitpoints = target.hitpoints - computeDamage(u, target))),
                 ].concat(
-                  if (target.hitpoints - computeDamage(u, target) <= 0) [SpawnGem(target)] else []
+                  if (target.hitpoints - computeDamage(u, target) <= 0) [SpawnGem(target.id, target.x, target.y)] else []
                 );
               default:
                 new Error('illegal');
@@ -395,16 +395,16 @@ class GameOf<TPlayer:Player> implements Model {
           case Some(u):
             @:privateAccess u.update(to);
         }
-      case SpawnGem(u):
-        unitKilled(u);
-        spawnGem(u.status.x, u.status.y);
-        case CollectGem(_, _): throw "Please, implement me before you die";
+      case SpawnGem(unitId, x, y):
+        unitKilled(unitId);
+        spawnGem(x, y);
+      case CollectGem(_, _): throw "Please, implement me before you die";
     }
     return reactions;
   }
 
-  @:transition private function unitKilled(u:Unit) {
-    return {units: units.filter(cu -> cu.id != u.id)};
+  @:transition private function unitKilled(unitId:UnitId) {
+    return {units: units.filter(cu -> cu.id != unitId)};
   }
 
   @:transition private function spawnGem(x:Int, y:Int) {

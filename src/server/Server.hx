@@ -17,25 +17,36 @@ class Server {
     trace('listening on port $port');
     new Server().run();
   }
+
+  public function new() {}
   
-  final routes:Map<String, RouteHandler>;
-  final players:State<List<Player>>;
-  final root:Root;
+  final rooms:Map<String, Room> = [];
 
-  public function new() {
-    routes = [];
-    players = new State(List.fromArray([]));
-
-    root = new Root({
-      route: (route, handler) -> routes[route] = handler,
-      players: players.observe()
-    });
-  }
+  function getRoom(id:String):Room
+    return
+      if (rooms.exists(id)) rooms[id];
+      else {
+        trace('[room-$id] Room created');
+        final routes = new Map<String, RouteHandler>();
+        final players = new State(List.fromArray([]));
+        final room:Room = {
+          id: id,
+          isRunning: false,
+          routes: routes,
+          players: players,
+          root: new Root({
+            route: (route, handler) -> routes[route] = handler,
+            players: players.observe()
+          })
+        };
+        rooms[id] = room;
+      }
 
   public function run() {
     final wss = new js.npm.ws.Server({port: port});
     wss.on("connection", (ws:WebSocket) -> {
       trace("WebSocket connected");
+      var room:Room = null;
       var player:Player = null;
 
       function call(route:String, ?data:Dynamic = null)
@@ -46,9 +57,12 @@ class Server {
       
       function disconnect(terminate:Bool = false) {
         if (player != null) {
-          trace('Player left: ${player.id}');
-          players.set(players.value.filter(p -> p.id != player.id));
-          if (routes.exists("leave")) routes["leave"](player, null);
+          trace('[room-${room.id}] Player left: ${player.id}');
+          room.players.set(room.players.value.filter(p -> p.id != player.id));
+          room.routes["leave"](player, null);
+          if (room.players.value.length == 0) rooms.remove(room.id);
+          room = null;
+          player = null;
         }
         if (terminate) ws.terminate();
       }
@@ -57,8 +71,11 @@ class Server {
         final msg = Json.parse(json), route = msg.call;
 
         if (route == "join") {
+          room = getRoom(msg.data.roomId);
+          if (room.isRunning)
+            return respond(route, Failure(new Error("Cannot join an already running game")));
           final playerId = msg.data.playerId;
-          if (players.value.exists(p -> p.id == playerId))
+          if (room.players.value.exists(p -> p.id == playerId))
             return respond(route, Failure(new Error('Player already connected: $playerId')));
           
           player = {
@@ -68,14 +85,14 @@ class Server {
               disconnect: () -> disconnect(true)
             }
           };
-          players.set(players.value.prepend(player));
-          trace('Player joined: ${player.id}');
+          room.players.set(room.players.value.prepend(player));
+          trace('[room-${room.id}] Player joined: ${player.id}');
         }
 
-        if (!routes.exists(route))
+        if (!room.routes.exists(route))
           return respond(route, Failure(new Error('Not implemented')));
         
-        final res = routes[route](player, msg.data);
+        final res = room.routes[route](player, msg.data);
         if (res != null)
           res.handle(data -> respond(route, data));
       });
@@ -86,4 +103,12 @@ class Server {
       });
     });
   }
+}
+
+typedef Room = {
+  final id:String;
+  final isRunning:Bool;
+  final routes:Map<String, RouteHandler>;
+  final players:State<List<Player>>;
+  final root:Root;
 }

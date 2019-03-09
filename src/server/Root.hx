@@ -6,7 +6,7 @@ class Root {
   public function new(d:RootDependencies) {
     this.d = d;
 
-    d.route("join", (player:Player, _) -> {
+    d.route("join", (player:Player, data:{roomId:String, playerId:String}) -> {
       for (p in d.players.value)
         if (p.id != player.id)
           p.connection.call("playerJoined", {playerId: player.id});
@@ -14,7 +14,8 @@ class Root {
       return {
         buildDate: Server.BUILD_DATE,
         hash: Server.HASH,
-        players: []
+        roomId: data.roomId,
+        players: [for (p in d.players.value) p.id]
       };
     });
 
@@ -24,6 +25,8 @@ class Root {
           p.connection.call("playerLeft", {playerId: player.id});
       return null;
     });
+
+    
   }
 }
 

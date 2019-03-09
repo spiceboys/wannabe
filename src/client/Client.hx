@@ -64,7 +64,8 @@ class Client {
   }
 
   static function testWS() {
-    new client.service.Remote("ws://localhost:2751", "Baby Spice")
+    final playerId = Std.string(Std.random(65536));
+    new client.service.Remote("ws://localhost:2751", playerId)
       .connect()
       .handle(serverInfo -> {
         trace('connected, serverInfo=$serverInfo');

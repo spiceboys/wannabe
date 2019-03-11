@@ -71,8 +71,16 @@ class GameView extends View {
 
   static final NOTIFICATIONS = css({
     position: 'fixed',
-    bottom: '10px',
+    top: '50%',
     left: '50%',
+    transform: 'translate(-50%, -50%)',
+    fontSize: 'xx-large',
+    textAlign: 'center',
+    borderRadius: '15px',
+    padding: '15px',
+    background: 'rgba(0, 0, 0, .45)',
+    color: 'white',
+    whiteSpace: 'pre'
   });
 
   function render()
@@ -123,11 +131,11 @@ class GameView extends View {
           {
             switch game.winner {
               case Some(winner): 
-                if (winner.id == game.self.id) "You Rule!";
-                else "You Suck! " + winner.name + " Rules!";
+                if (winner.id == game.self.id) "🤠 You Rule!";
+                else "😞 You Suck! \n" + winner.name + " Rules!";
               case None:
                 if (game.survivingPlayers.exists(p -> p.id == game.self.id)) "";
-                else "You Suck!";
+                else "😞 You Suck!";
             }
           }
         </div>
